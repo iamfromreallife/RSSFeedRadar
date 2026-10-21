@@ -1,3 +1,8 @@
+<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221921" src="https://github.com/user-attachments/assets/e61623a1-39f2-4aeb-97f5-c6b9ea7d78dd" />
+<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221838" src="https://github.com/user-attachments/assets/30c62fe6-1187-4d80-814a-6d8a5614e89b" />
+<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221818" src="https://github.com/user-attachments/assets/2e6cd4c8-e199-45dc-9bf4-979b0e259cb9" />
+
+
 # RSS Feed Radar — RSS & Feed Finder
 
 A Manifest V3 Chrome extension that discovers RSS, Atom, and JSON Feed links on the active page, displays the number of discovered feeds on the toolbar icon, and opens a rich preview for each feed.
