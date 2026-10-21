@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "RSS Feed Radar",
+  "version": "1.5.0",
+  "description": "Discover website feeds and subscribe in seconds.",
+  "minimum_chrome_version": "110",
+  "permissions": [
+    "storage",
+    "clipboardWrite",
+    "scripting",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "RSS Feed Radar — RSS & Feed Finder",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16-idle.png",
+      "32": "icons/icon32-idle.png",
+      "48": "icons/icon48-idle.png",
+      "128": "icons/icon128-idle.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16-idle.png",
+    "32": "icons/icon32-idle.png",
+    "48": "icons/icon48-idle.png",
+    "128": "icons/icon128-idle.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

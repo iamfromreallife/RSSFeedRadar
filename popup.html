@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RSS Feed Radar</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="11" cy="29" r="3" fill="currentColor"/>
+            <path d="M9 19.5C15.35 19.5 20.5 24.65 20.5 31" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M9 10C20.6 10 30 19.4 30 31" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+            <circle cx="29.8" cy="10.2" r="2.4" fill="#B7AEFF"/>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <div class="brand-name">RSS Feed Radar</div>
+          <div class="brand-tagline" data-i18n="tagline">Your feed radar</div>
+        </div>
+      </div>
+      <a class="donation-button" href="https://buy.stripe.com/00wbJ15jz2bAeRt1NI7Zu00" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">♥</span><span data-i18n="donate">Donate</span></a>
+    </header>
+
+    <section class="hero-panel">
+      <div class="hero-orb orb-one"></div>
+      <div class="hero-orb orb-two"></div>
+      <div class="hero-content">
+        <div class="status-line"><span class="status-dot"></span><span data-i18n="scanStatus">PAGE SCAN</span></div>
+        <div class="hero-heading" data-i18n="heroTitle">A little feed<br>magic.</div>
+        <div class="hero-subtitle" data-i18n="heroSubtitle">Every feed on this page, gathered in one place.</div>
+      </div>
+      <div class="count-orbit" aria-hidden="true">
+        <div class="orbit-ring ring-back"></div>
+        <div class="orbit-ring ring-front"></div>
+        <div class="count-core"><span id="feedCount">0</span><small data-i18n="foundLabel">FOUND</small></div>
+        <span class="orbit-spark spark-a"></span><span class="orbit-spark spark-b"></span><span class="orbit-spark spark-c"></span>
+      </div>
+    </section>
+
+    <section class="feeds-section">
+      <div class="section-heading">
+        <div>
+          <h1 data-i18n="availableFeeds">Available feeds</h1>
+          <p id="pageLabel" data-i18n="searching">Looking for feeds on this page…</p>
+        </div>
+        <button class="icon-button" id="rescanButton" title="Scan again" data-i18n-title="scanAgain" aria-label="Scan again">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16.3 7A6.8 6.8 0 0 0 4.4 5.4L3 7.1M3 3.2v3.9h3.9M3.7 13A6.8 6.8 0 0 0 15.6 14.6L17 12.9M17 16.8v-3.9h-3.9"/></svg>
+        </button>
+      </div>
+      <div id="feedList" class="feed-list" aria-live="polite"></div>
+      <div id="emptyState" class="empty-state" hidden>
+        <div class="empty-art" aria-hidden="true">
+          <div class="empty-glow"></div>
+          <svg viewBox="0 0 64 64" fill="none"><path d="M16 24c13.3 0 24 10.7 24 24M16 14c18.8 0 34 15.2 34 34" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><circle cx="16" cy="48" r="4" fill="currentColor"/><path d="m43 15 3.5-7 3.5 7 7 3.5-7 3.5-3.5 7-3.5-7-7-3.5 7-3.5Z" fill="#B9B0FF"/></svg>
+        </div>
+        <h2 data-i18n="emptyTitle">No feeds found just yet</h2>
+        <p data-i18n="emptyBody">This page may not publish a feed, or it may be using a format we don’t recognize yet.</p>
+      </div>
+    </section>
+
+    <footer class="footer-line">
+      <div class="footer-left">
+        <div class="language-wrap" id="languageWrap">
+          <svg class="language-globe" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.2"/><path d="M2.9 10h14.2M10 2.8c2 2 3 4.4 3 7.2s-1 5.2-3 7.2c-2-2-3-4.4-3-7.2s1-5.2 3-7.2Z"/></svg>
+          <button class="language-trigger" id="languageButton" type="button" aria-label="Language" aria-haspopup="menu" aria-expanded="false"><span id="languageCurrent">English</span><svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button>
+          <div class="language-menu" id="languageMenu" role="menu" aria-label="Choose language" hidden>
+            <button type="button" class="language-option" data-language-option="en" role="menuitemradio" aria-checked="true">English</button>
+            <button type="button" class="language-option" data-language-option="pt" role="menuitemradio" aria-checked="false">Português</button>
+            <button type="button" class="language-option" data-language-option="es" role="menuitemradio" aria-checked="false">Español</button>
+            <button type="button" class="language-option" data-language-option="it" role="menuitemradio" aria-checked="false">Italiano</button>
+            <button type="button" class="language-option" data-language-option="fr" role="menuitemradio" aria-checked="false">Français</button>
+            <button type="button" class="language-option" data-language-option="de" role="menuitemradio" aria-checked="false">Deutsch</button>
+          </div>
+          <select id="languageSelect" class="language-native-select" aria-label="Language" tabindex="-1" aria-hidden="true">
+            <option value="en">English</option><option value="pt">Português</option><option value="es">Español</option><option value="it">Italiano</option><option value="fr">Français</option><option value="de">Deutsch</option>
+          </select>
+        </div>
+        <span class="privacy-note"><span class="footer-dot"></span><span data-i18n="privacyNote">Local discovery · No tracking</span></span>
+      </div>
+      <span class="footer-version">1.4.1</span>
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
