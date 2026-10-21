@@ -1,6 +1,4 @@
-<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221921" src="https://github.com/user-attachments/assets/e61623a1-39f2-4aeb-97f5-c6b9ea7d78dd" />
-<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221838" src="https://github.com/user-attachments/assets/30c62fe6-1187-4d80-814a-6d8a5614e89b" />
-<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221818" src="https://github.com/user-attachments/assets/2e6cd4c8-e199-45dc-9bf4-979b0e259cb9" />
+
 
 
 # RSS Feed Radar — RSS & Feed Finder
@@ -11,8 +9,9 @@ A Manifest V3 Chrome extension that discovers RSS, Atom, and JSON Feed links on 
 
 - Per-tab toolbar badge showing the number of discovered feeds.
 - Darker green toolbar icon when no feeds are detected and dark orange when feeds are found.
-- Popup with feed title, URL, and a translated “Preview and subscribe” action.
+- Popup with feed title, URL, and a “Preview and subscribe” action.
 - Reader page with article cards, a list view, article modal previews, images, and typography controls.
+- Light/Dark switch.
 - Subscribe actions for copying the feed URL, Inoreader, Feedly, NewsBlur, The Old Reader, and Readwise Reader.
 - English, Portuguese, Spanish, Italian, French, and German interface translations.
 - Discovery from standard RSS/Atom/JSON Feed declarations, visible feed links, and common feed URL patterns.
@@ -32,8 +31,6 @@ Chrome requests access to HTTP and HTTPS pages because the extension inspects pa
 
 Selecting **Preview and subscribe** opens a new reader tab. The reader parses RSS, Atom, and JSON Feed content, displays article metadata and images when available, and keeps the subscription actions in a persistent bottom bar. The **Cards** and **List** tabs offer two views of the feed’s articles. Selecting a story opens an in-reader modal; its title links to the original article in a new tab. Reader settings include font family, font size, line spacing, and dark mode.
 
-## Notes
-
-- Pages such as `chrome://` and the Chrome Web Store do not allow extension scripts and cannot be scanned.
-- The toolbar badge is capped visually at `99+`; the popup displays the actual count.
-- Some feed servers block direct cross-origin requests. In that case, the reader displays an error and keeps the feed URL available for external reader services.
+<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221921" src="https://github.com/user-attachments/assets/e61623a1-39f2-4aeb-97f5-c6b9ea7d78dd" />
+<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221838" src="https://github.com/user-attachments/assets/30c62fe6-1187-4d80-814a-6d8a5614e89b" />
+<img width="1280" height="800" alt="Captura de ecrã 2026-10-21 221818" src="https://github.com/user-attachments/assets/2e6cd4c8-e199-45dc-9bf4-979b0e259cb9" />
