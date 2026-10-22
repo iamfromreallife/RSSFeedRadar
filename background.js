@@ -561,7 +561,7 @@ const UPDATE_STORAGE_KEY = 'rssFeedRadarUpdateState';
 const UPDATE_CHECK_INTERVAL_MINUTES = 4 * 60;
 
 function compareExtensionVersions(remoteVersion, installedVersion) {
-  const valid = /^\\d+(?:\\.\\d+){0,3}$/;
+  const valid = /^\d+(?:\.\d+){0,3}$/;
   if (!valid.test(String(remoteVersion)) || !valid.test(String(installedVersion))) {
     throw new Error('Invalid extension version in manifest');
   }
