@@ -574,6 +574,7 @@ const UPDATE_CHECK_ALARM = 'rss-feed-radar-repository-update-check';
 const UPDATE_REPO_MANIFEST_URL = 'https://raw.githubusercontent.com/iamfromreallife/RSSFeedRadar/main/manifest.json';
 const UPDATE_STORAGE_KEY = 'rssFeedRadarUpdateState';
 const UPDATE_CHECK_INTERVAL_MINUTES = 4 * 60;
+const UPDATE_CHECK_SCHEMA = 2;
 
 function compareExtensionVersions(remoteVersion, installedVersion) {
   const valid = /^\d+(?:\.\d+){0,3}$/;
@@ -637,7 +638,8 @@ async function checkRepositoryForUpdates(options = {}) {
   const previous = existing[UPDATE_STORAGE_KEY] || {};
   // Avoid API requests each time the popup is opened repeatedly. Startup, alarms,
   // and the small manual refresh button can force a fresh check.
-  const recentSuccessfulCheck = previous.installedVersion === installedVersion
+  const recentSuccessfulCheck = previous.checkerSchema === UPDATE_CHECK_SCHEMA
+    && previous.installedVersion === installedVersion
     && typeof previous.latestVersion === 'string'
     && previous.checkedAt
     && !previous.lastCheckError
@@ -650,6 +652,7 @@ async function checkRepositoryForUpdates(options = {}) {
     if (!latestVersion) throw new Error('GitHub manifest has no version');
     const comparison = compareExtensionVersions(latestVersion, installedVersion);
     const state = {
+      checkerSchema: UPDATE_CHECK_SCHEMA,
       installedVersion,
       latestVersion,
       checkedAt: Date.now(),
@@ -664,6 +667,7 @@ async function checkRepositoryForUpdates(options = {}) {
     return state;
   } catch (error) {
     const state = {
+      checkerSchema: UPDATE_CHECK_SCHEMA,
       installedVersion,
       latestVersion: previous.latestVersion || '',
       checkedAt: Date.now(),
@@ -695,9 +699,9 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 chrome.runtime.onStartup.addListener(() => {
   ensureUpdateCheckAlarm().catch(() => {});
-  checkRepositoryForUpdates().catch(() => {});
+  checkRepositoryForUpdates({ force: true }).catch(() => {});
 });
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === UPDATE_CHECK_ALARM) checkRepositoryForUpdates().catch(() => {});
+  if (alarm.name === UPDATE_CHECK_ALARM) checkRepositoryForUpdates({ force: true }).catch(() => {});
 });
 ensureUpdateCheckAlarm().catch(() => {});
