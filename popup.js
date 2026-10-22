@@ -312,7 +312,7 @@ checkUpdatesButton?.addEventListener('click', async () => {
   checkUpdatesButton.classList.add('is-checking');
   showToast(translate('checkingUpdates'));
   try {
-    const state = await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW' });
+    const state = await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW', force: true });
     renderUpdateAvailability(state);
     if (state?.lastCheckError) showToast(translate('updateCheckFailed'));
     else if (state?.updateAvailable) showToast(translate('updateAvailable'));
