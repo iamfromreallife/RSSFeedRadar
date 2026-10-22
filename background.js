@@ -556,15 +556,13 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 // Repository update checker: poll on startup/install and every four hours.
 const UPDATE_CHECK_ALARM = 'rss-feed-radar-repository-update-check';
 const UPDATE_REPO_API = 'https://api.github.com/repos/iamfromreallife/RSSFeedRadar/commits?per_page=1';
-const UPDATE_REPO_PAGE = 'https://github.com/iamfromreallife/RSSFeedRadar';
 const UPDATE_STORAGE_KEY = 'rssFeedRadarUpdateState';
 const UPDATE_CHECK_INTERVAL_MINUTES = 4 * 60;
 
 async function checkRepositoryForUpdates() {
   try {
     const response = await fetch(UPDATE_REPO_API, {
-      method: 'GET',
-      cache: 'no-store',
+      method: 'GET', cache: 'no-store',
       headers: { Accept: 'application/vnd.github+json' }
     });
     if (!response.ok) throw new Error(`GitHub returned HTTP ${response.status}`);
@@ -575,8 +573,7 @@ async function checkRepositoryForUpdates() {
     const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY);
     const prior = stored[UPDATE_STORAGE_KEY] || {};
     const installedVersion = chrome.runtime.getManifest().version;
-    // When a user installs a newer extension package, establish a fresh baseline so
-    // the update button does not remain visible after the update was installed.
+    // A new installed extension version resets the baseline to the current repository head.
     const resetBaseline = !prior.baselineCommit || prior.installedVersion !== installedVersion;
     const baselineCommit = resetBaseline ? latest.sha : prior.baselineCommit;
     const updateAvailable = !resetBaseline && baselineCommit !== latest.sha;
@@ -603,9 +600,7 @@ async function checkRepositoryForUpdates() {
 
 async function ensureUpdateCheckAlarm() {
   const existing = await chrome.alarms.get(UPDATE_CHECK_ALARM).catch(() => null);
-  if (!existing) {
-    chrome.alarms.create(UPDATE_CHECK_ALARM, { delayInMinutes: 0.1, periodInMinutes: UPDATE_CHECK_INTERVAL_MINUTES });
-  }
+  if (!existing) chrome.alarms.create(UPDATE_CHECK_ALARM, { delayInMinutes: 0.1, periodInMinutes: UPDATE_CHECK_INTERVAL_MINUTES });
 }
 chrome.runtime.onInstalled.addListener(() => {
   ensureUpdateCheckAlarm().catch(() => {});
@@ -629,7 +624,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     checkRepositoryForUpdates().then(async () => {
       const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY);
       sendResponse(stored[UPDATE_STORAGE_KEY] || { updateAvailable: false, checkedAt: Date.now() });
-    }).catch(() => sendResponse({ updateAvailable: false, checkedAt: Date.now() }));
+    }).catch(() => sendResponse({ updateAvailable: false, checkedAt: Date.now(), lastCheckError: 'Update check failed' }));
     return true;
   }
   return false;
