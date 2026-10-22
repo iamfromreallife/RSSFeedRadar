@@ -20,7 +20,24 @@
       return url.href;
     } catch (_) { return null; }
   };
-  const looksLikeFeedUrl = (raw) => /(?:\.rss(?:$|[?#])|\.atom(?:$|[?#])|\/(?:feed|rss|atom)(?:\.xml)?(?:\/|$|[?#])|\/(?:feed|rss|atom)[-_][^/?#]+\.xml(?:$|[?#])|\.rss\.xml(?:$|[?#])|[?&](?:format|output)=(?:rss|atom|xml|json))/i.test(raw || '');
+  // WordPress and other CMSs expose oEmbed metadata endpoints using alternate XML/JSON
+  // links. These describe an article; they are not RSS/Atom/JSON Feed documents.
+  const isOEmbedUrl = (raw) => {
+    try {
+      const url = new URL(raw, location.href);
+      const route = decodeURIComponent(url.pathname).toLowerCase();
+      const restRoute = (url.searchParams.get('rest_route') || '').toLowerCase();
+      return /(?:^|\/)oembed(?:\/|\.|$)/i.test(route)
+        || /(?:^|\/)oembed(?:\/|$)/i.test(restRoute)
+        || (/\/(?:embed|oembed)\/?$/i.test(route)
+          && url.searchParams.has('url')
+          && (url.searchParams.has('format') || /\.(?:xml|json)$/i.test(url.pathname)));
+    } catch (_) { return /(?:wp-json\/oembed|oembed\/1\.0\/embed)/i.test(String(raw || '')); }
+  };
+  const looksLikeFeedUrl = (raw) => {
+    if (!raw || isOEmbedUrl(raw)) return false;
+    return /(?:\.rss(?:$|[?#])|\.atom(?:$|[?#])|\/(?:feed|rss|atom)(?:\.xml)?(?:\/|$|[?#])|\/(?:feed|rss|atom)[-_][^/?#]+\.xml(?:$|[?#])|\.rss\.xml(?:$|[?#])|\.json(?:$|[?#])|[?&](?:format|output)=(?:rss|atom|xml|json))/i.test(raw || '');
+  };
   // YouTube's Subscriptions page is a signed-in HTML view, not an RSS endpoint.
   // Public YouTube RSS feeds are channel-specific: /feeds/videos.xml?channel_id=UC...
   const isYouTubeSubscriptionsPageUrl = (raw) => {
@@ -33,7 +50,7 @@
       );
     } catch (_) { return false; }
   };
-  const hasFeedType = (type) => /(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|feed\+json|jsonfeed|rdf\+xml|xml)|text\/(?:rss|xml))/i.test(type || '');
+  const hasFeedType = (type) => /(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|feed\+json|jsonfeed|rdf\+xml)|text\/(?:rss|atom))/i.test(type || '');
 
   function inferredTitle(url, context = '') {
     const cleanContext = tidy(context, 140);
