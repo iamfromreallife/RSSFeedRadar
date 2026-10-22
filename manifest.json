@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "RSS Feed Radar",
-  "version": "1.5.13",
+  "version": "1.5.14",
   "description": "Discover feeds from the current page and across the website domain.",
   "minimum_chrome_version": "110",
   "permissions": [
