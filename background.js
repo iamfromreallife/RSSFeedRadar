@@ -471,7 +471,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === 'CHECK_UPDATES_NOW') {
-    checkRepositoryForUpdates()
+    checkRepositoryForUpdates({ force: message.force === true })
       .then((state) => sendResponse(state || { updateAvailable: false, checkedAt: Date.now() }))
       .catch((error) => sendResponse({ updateAvailable: false, checkedAt: Date.now(), lastCheckError: String(error?.message || error) }));
     return true;
@@ -630,15 +630,25 @@ async function fetchRemoteManifest() {
   return manifest;
 }
 
-async function checkRepositoryForUpdates() {
+async function checkRepositoryForUpdates(options = {}) {
+  const force = options.force === true;
+  const installedVersion = chrome.runtime.getManifest().version;
+  const existing = await chrome.storage.local.get(UPDATE_STORAGE_KEY).catch(() => ({}));
+  const previous = existing[UPDATE_STORAGE_KEY] || {};
+  // Avoid API requests each time the popup is opened repeatedly. Startup, alarms,
+  // and the small manual refresh button can force a fresh check.
+  const recentSuccessfulCheck = previous.installedVersion === installedVersion
+    && typeof previous.latestVersion === 'string'
+    && previous.checkedAt
+    && !previous.lastCheckError
+    && Date.now() - previous.checkedAt < 3 * 60 * 1000;
+  if (!force && recentSuccessfulCheck) return previous;
+
   try {
     const remoteManifest = await fetchRemoteManifest();
     const latestVersion = String(remoteManifest?.version || '').trim();
     if (!latestVersion) throw new Error('GitHub manifest has no version');
-    const installedVersion = chrome.runtime.getManifest().version;
     const comparison = compareExtensionVersions(latestVersion, installedVersion);
-    const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY);
-    const prior = stored[UPDATE_STORAGE_KEY] || {};
     const state = {
       installedVersion,
       latestVersion,
@@ -653,14 +663,19 @@ async function checkRepositoryForUpdates() {
     } catch (_) {}
     return state;
   } catch (error) {
-    const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY).catch(() => ({}));
-    const prior = stored[UPDATE_STORAGE_KEY] || {};
     const state = {
-      ...prior,
+      installedVersion,
+      latestVersion: previous.latestVersion || '',
       checkedAt: Date.now(),
+      updateAvailable: previous.installedVersion === installedVersion && previous.updateAvailable === true,
+      current: false,
+      repository: 'https://github.com/iamfromreallife/RSSFeedRadar',
       lastCheckError: String(error?.message || error).slice(0, 180)
     };
     await chrome.storage.local.set({ [UPDATE_STORAGE_KEY]: state }).catch(() => {});
+    try {
+      chrome.runtime.sendMessage({ type: 'REPOSITORY_UPDATE_STATE', state }).catch(() => {});
+    } catch (_) {}
     return state;
   }
 }
@@ -676,7 +691,7 @@ async function ensureUpdateCheckAlarm() {
 }
 chrome.runtime.onInstalled.addListener(() => {
   ensureUpdateCheckAlarm().catch(() => {});
-  checkRepositoryForUpdates().catch(() => {});
+  checkRepositoryForUpdates({ force: true }).catch(() => {});
 });
 chrome.runtime.onStartup.addListener(() => {
   ensureUpdateCheckAlarm().catch(() => {});
