@@ -245,8 +245,8 @@ function getRetryAfterSeconds(response) {
 function isYouTubeSubscriptionsPageUrl(raw) {
   try {
     const url = new URL(raw);
-    const host = url.hostname.toLowerCase().replace(/^www\\./, '');
-    return host === 'youtube.com' && (/^\\/feed\\/subscriptions\\/?$/i.test(url.pathname) || /^\\/subscription_manager\\/?$/i.test(url.pathname));
+    const host = url.hostname.toLowerCase().replace(/^www\./, '');
+    return host === 'youtube.com' && (/^\/feed\/subscriptions\/?$/i.test(url.pathname) || /^\/subscription_manager\/?$/i.test(url.pathname));
   } catch (_) { return false; }
 }
 
