@@ -5,7 +5,7 @@ A Manifest V3 Chrome extension that discovers RSS, Atom, and JSON Feed links on 
 ## Features
 
 - Per-tab toolbar badge showing the number of discovered feeds.
-- Darker green toolbar icon when no feeds are detected and dark orange when feeds are found.
+- Green toolbar icon when no feeds are detected and dark orange when feeds are found.
 - Popup with feed title, URL, and a translated “Preview and subscribe” action.
 - Reader page with article cards, a list view, article modal previews, images, and typography controls.
 - Subscribe actions for copying the feed URL, Inoreader, Feedly, NewsBlur, The Old Reader, and Readwise Reader.
