@@ -730,7 +730,8 @@ const latestMainFrameRequestByTab = new Map();
 const handledFeedRequestIds = new Map();
 
 function feedPathHint(url) {
-  const path = decodeURIComponent(url.pathname || '').toLowerCase();
+  let path = String(url.pathname || '').toLowerCase();
+  try { path = decodeURIComponent(path); } catch (_) { /* Keep encoded path for matching. */ }
   const params = url.searchParams;
   const hasFeedQuery = ['feed', 'format', 'output', 'type'].some((key) =>
     /^(?:rss2?|atom|json|jsonfeed)$/i.test(params.get(key) || '')
@@ -738,7 +739,7 @@ function feedPathHint(url) {
   return hasFeedQuery
     || /\.(?:rss|atom|rdf)(?:\.xml)?$/i.test(path)
     || /(?:^|\/)feeds?(?:\/|$)/i.test(path)
-    || /(?:^|\/)(?:feed|rss|atom)(?:\.xml)?\/?$/i.test(path)
+    || /(?:^|\/)(?:feed|rss|atom)(?:\.(?:xml|json))?\/?$/i.test(path)
     || /(?:^|\/)(?:feed|rss|atom|channel|posts?)[-_][^/]+\.xml$/i.test(path)
     || /\.(?:feed|rss|atom)\.json$/i.test(path);
 }
@@ -763,7 +764,8 @@ function isSupportedFeedNavigation(details) {
   const genericXml = /^(?:application\/xml|text\/xml|application\/x-xml)$/.test(mime);
   const genericJson = /^(?:application\/json|text\/json)$/.test(mime);
   const plainText = /^text\/plain$/.test(mime);
-  const attachmentFeedName = /filename\*?=[^;]*\.(?:rss|atom|rdf)(?:\.xml)?(?:["';]|$)/i.test(disposition);
+  const attachmentFeedName = /filename\*?=[^;]*\.(?:rss|atom|rdf)(?:\.xml)?(?:["';]|$)/i.test(disposition)
+    || /filename\*?=[^;]*(?:feed|rss|atom)[^;]*\.xml(?:["';]|$)/i.test(disposition);
   return attachmentFeedName || (pathHint && (
     genericXml
     || genericJson
