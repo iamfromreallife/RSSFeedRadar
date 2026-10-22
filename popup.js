@@ -271,29 +271,32 @@ chrome.runtime.onMessage.addListener((message) => {
 })();
 
 
+function renderUpdateAvailability(state) {
+  if (!updateAvailableButton) return;
+  const installedVersion = chrome.runtime.getManifest().version;
+  const stateMatchesInstall = state?.installedVersion === installedVersion
+    && typeof state?.latestVersion === 'string';
+  updateAvailableButton.hidden = !(stateMatchesInstall && state.updateAvailable === true);
+  updateAvailableButton.title = stateMatchesInstall
+    ? `Installed ${installedVersion} · Latest ${state.latestVersion}`
+    : translate('checkUpdates');
+}
+
 async function checkUpdatesOnPopupOpen() {
   try {
-    // Check the manifest whenever the popup opens so a newly published version
-    // becomes visible immediately rather than waiting for the four-hour alarm.
-    await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW' });
+    // Render the exact response from the fresh GitHub check instead of racing a
+    // second storage read against the network response.
+    const state = await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW' });
+    renderUpdateAvailability(state);
   } catch (_) {
-    // Keep the popup usable if GitHub is temporarily unavailable.
+    await syncUpdateAvailability();
   }
-  await syncUpdateAvailability();
 }
 
 async function syncUpdateAvailability() {
   try {
     const state = await chrome.runtime.sendMessage({ type: 'GET_UPDATE_STATE' });
-    if (updateAvailableButton) {
-      const installedVersion = chrome.runtime.getManifest().version;
-      // Ignore stale state left by an older checker/schema until the remote manifest
-      // has been checked for this installed version.
-      const stateMatchesInstall = state?.installedVersion === installedVersion
-        && typeof state?.latestVersion === 'string';
-      updateAvailableButton.hidden = !(stateMatchesInstall && state.updateAvailable);
-      if (state?.latestVersion) updateAvailableButton.title = `Installed ${installedVersion} · Latest ${state.latestVersion}`;
-    }
+    renderUpdateAvailability(state);
   } catch (_) {
     if (updateAvailableButton) updateAvailableButton.hidden = true;
   }
@@ -310,10 +313,11 @@ checkUpdatesButton?.addEventListener('click', async () => {
   showToast(translate('checkingUpdates'));
   try {
     const state = await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW' });
-    await syncUpdateAvailability();
+    renderUpdateAvailability(state);
     if (state?.lastCheckError) showToast(translate('updateCheckFailed'));
     else if (state?.updateAvailable) showToast(translate('updateAvailable'));
-    else showToast(translate('upToDate'));
+    else if (state?.current) showToast(translate('upToDate'));
+    else showToast(translate('updateCheckFailed'));
   } catch (_) {
     showToast(translate('updateCheckFailed'));
   } finally {
