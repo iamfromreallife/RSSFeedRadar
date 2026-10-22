@@ -29,6 +29,21 @@ Chrome requests access to HTTP and HTTPS pages because the extension inspects pa
 
 Selecting **Preview and subscribe** opens a new reader tab. The reader parses RSS, Atom, and JSON Feed content, displays article metadata and images when available, and keeps the subscription actions in a persistent bottom bar. The **Cards** and **List** tabs offer two views of the feed’s articles. Selecting a story opens an in-reader modal; its title links to the original article in a new tab. Reader settings include font family, font size, line spacing, and dark mode.
 
+### Screenshots
+
+**Extension popup**
+
+<img width="491" height="550" alt="RSS Feed Radar extension popup" src="https://github.com/user-attachments/assets/9b2ae670-2f84-446c-86d2-9937c40e892d" />
+
+**Feed reader**
+
+<img width="1280" height="800" alt="RSS Feed Radar reader preview" src="https://github.com/user-attachments/assets/e61623a1-39f2-4aeb-97f5-c6b9ea7d78dd" />
+
+<img width="1280" height="800" alt="RSS Feed Radar reader cards view" src="https://github.com/user-attachments/assets/30c62fe6-1187-4d80-814a-6d8a5614e89b" />
+
+<img width="1280" height="800" alt="RSS Feed Radar reader list view" src="https://github.com/user-attachments/assets/2e6cd4c8-e199-45dc-9bf4-979b0e259cb9" />
+
+
 ## Notes
 
 - Pages such as `chrome://` and the Chrome Web Store do not allow extension scripts and cannot be scanned.
