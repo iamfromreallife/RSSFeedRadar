@@ -462,6 +462,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  // Keep update messages in the same listener as feed messages so the popup has
+  // one deterministic response path rather than relying on competing listeners.
+  if (message?.type === 'GET_UPDATE_STATE') {
+    chrome.storage.local.get(UPDATE_STORAGE_KEY)
+      .then((stored) => sendResponse(stored[UPDATE_STORAGE_KEY] || { updateAvailable: false, checkedAt: 0 }))
+      .catch(() => sendResponse({ updateAvailable: false, checkedAt: 0 }));
+    return true;
+  }
+  if (message?.type === 'CHECK_UPDATES_NOW') {
+    checkRepositoryForUpdates()
+      .then((state) => sendResponse(state || { updateAvailable: false, checkedAt: Date.now() }))
+      .catch((error) => sendResponse({ updateAvailable: false, checkedAt: Date.now(), lastCheckError: String(error?.message || error) }));
+    return true;
+  }
+
   return false;
 });
 
@@ -577,15 +592,47 @@ function compareExtensionVersions(remoteVersion, installedVersion) {
   return 0;
 }
 
-async function checkRepositoryForUpdates() {
+async function fetchRemoteManifest() {
+  const cacheToken = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const apiUrl = `https://api.github.com/repos/iamfromreallife/RSSFeedRadar/contents/manifest.json?ref=main&_=${cacheToken}`;
+  let apiError = null;
+
+  // Prefer the Contents API with a unique URL to avoid stale raw-file CDN responses.
   try {
-    const response = await fetch(`${UPDATE_REPO_MANIFEST_URL}?_=${Date.now()}`, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       cache: 'no-store',
-      headers: { Accept: 'application/json, text/plain;q=0.9' }
+      headers: { Accept: 'application/vnd.github+json', 'Cache-Control': 'no-cache' }
     });
-    if (!response.ok) throw new Error(`GitHub returned HTTP ${response.status}`);
-    const remoteManifest = await response.json();
+    if (!response.ok) throw new Error(`GitHub API returned HTTP ${response.status}`);
+    const payload = await response.json();
+    if (payload?.content) {
+      const binary = atob(String(payload.content).replace(/\\s/g, ''));
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+    if (payload?.version) return payload;
+    throw new Error('GitHub API returned no manifest content');
+  } catch (error) {
+    apiError = error;
+  }
+
+  // Raw-content fallback also bypasses caches.
+  const rawUrl = `${UPDATE_REPO_MANIFEST_URL}?_=${cacheToken}`;
+  const response = await fetch(rawUrl, {
+    method: 'GET',
+    cache: 'no-store',
+    headers: { Accept: 'application/json, text/plain;q=0.9', 'Cache-Control': 'no-cache' }
+  });
+  if (!response.ok) throw new Error(`GitHub manifest fetch failed (API: ${apiError?.message || 'unknown'}; raw: HTTP ${response.status})`);
+  const manifest = await response.json();
+  if (!manifest?.version) throw new Error('GitHub returned a manifest without a version');
+  return manifest;
+}
+
+async function checkRepositoryForUpdates() {
+  try {
+    const remoteManifest = await fetchRemoteManifest();
     const latestVersion = String(remoteManifest?.version || '').trim();
     if (!latestVersion) throw new Error('GitHub manifest has no version');
     const installedVersion = chrome.runtime.getManifest().version;
@@ -637,20 +684,5 @@ chrome.runtime.onStartup.addListener(() => {
 });
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === UPDATE_CHECK_ALARM) checkRepositoryForUpdates().catch(() => {});
-});
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.type === 'GET_UPDATE_STATE') {
-    chrome.storage.local.get(UPDATE_STORAGE_KEY)
-      .then((stored) => sendResponse(stored[UPDATE_STORAGE_KEY] || { updateAvailable: false, checkedAt: 0 }))
-      .catch(() => sendResponse({ updateAvailable: false, checkedAt: 0 }));
-    return true;
-  }
-  if (message?.type === 'CHECK_UPDATES_NOW') {
-    checkRepositoryForUpdates()
-      .then((state) => sendResponse(state || { updateAvailable: false, checkedAt: Date.now() }))
-      .catch(() => sendResponse({ updateAvailable: false, checkedAt: Date.now(), lastCheckError: 'Update check failed' }));
-    return true;
-  }
-  return false;
 });
 ensureUpdateCheckAlarm().catch(() => {});
