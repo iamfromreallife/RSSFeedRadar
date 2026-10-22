@@ -574,9 +574,15 @@ async function checkRepositoryForUpdates() {
 
     const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY);
     const prior = stored[UPDATE_STORAGE_KEY] || {};
-    const updateAvailable = Boolean(prior.baselineCommit && prior.baselineCommit !== latest.sha);
+    const installedVersion = chrome.runtime.getManifest().version;
+    // When a user installs a newer extension package, establish a fresh baseline so
+    // the update button does not remain visible after the update was installed.
+    const resetBaseline = !prior.baselineCommit || prior.installedVersion !== installedVersion;
+    const baselineCommit = resetBaseline ? latest.sha : prior.baselineCommit;
+    const updateAvailable = !resetBaseline && baselineCommit !== latest.sha;
     const state = {
-      baselineCommit: prior.baselineCommit || latest.sha,
+      baselineCommit,
+      installedVersion,
       latestCommit: latest.sha,
       latestMessage: String(latest.commit?.message || '').split('\n')[0].slice(0, 160),
       latestDate: latest.commit?.committer?.date || latest.commit?.author?.date || '',
