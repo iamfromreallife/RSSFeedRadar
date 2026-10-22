@@ -171,3 +171,19 @@ button, .subscribe-button, .menu-item, .donate-button, .icon-button, .language-w
 /* Align each Preview and subscribe action to the left edge of its feed card. */
 .feed-actions { justify-content: flex-start !important; }
 @media (max-width: 420px) { .feed-actions { justify-content: flex-start !important; } }
+
+
+/* Repository update CTA shown above the banner when a newer commit is available. */
+.update-available-button {
+  display:flex; align-items:center; gap:10px; width:100%; min-width:0;
+  margin:-5px 0 13px; padding:10px 13px; border:1px solid #bde7d1;
+  border-radius:13px; background:linear-gradient(120deg,#eafaf1,#f6fff9);
+  color:#176b41; text-decoration:none; font-size:12px; font-weight:850;
+  line-height:1.25; box-shadow:0 5px 15px rgba(35,137,83,.08);
+  transition:transform .15s,box-shadow .15s,border-color .15s;
+}
+.update-available-button:hover { transform:translateY(-1px); border-color:#8ed5b0; box-shadow:0 8px 19px rgba(35,137,83,.13); }
+.update-available-button[hidden] { display:none!important; }
+.update-available-button .update-dot { width:8px;height:8px;border-radius:50%;background:#27a766;box-shadow:0 0 0 4px rgba(39,167,102,.12);flex:0 0 auto; }
+.update-available-button [data-i18n="updateAvailable"] { flex:1; min-width:0; }
+.update-available-button .update-arrow { font-size:15px; }
