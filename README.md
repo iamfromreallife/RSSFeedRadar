@@ -16,6 +16,7 @@ A Manifest V3 Chrome extension that discovers RSS, Atom, and JSON Feed links on 
 - English, Portuguese, Spanish, Italian, French, and German interface translations.
 - Discovery from standard RSS/Atom/JSON Feed declarations, visible feed links, and common feed URL patterns.
 - Local page state; no analytics or external tracking service.
+- Extension updater that checks github
 
 ## Install in Chrome
 
