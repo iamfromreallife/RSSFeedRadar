@@ -187,3 +187,32 @@ button, .subscribe-button, .menu-item, .donate-button, .icon-button, .language-w
 .update-available-button .update-dot { width:8px;height:8px;border-radius:50%;background:#27a766;box-shadow:0 0 0 4px rgba(39,167,102,.12);flex:0 0 auto; }
 .update-available-button [data-i18n="updateAvailable"] { flex:1; min-width:0; }
 .update-available-button .update-arrow { font-size:15px; }
+
+
+/* Manifest-derived version label and manual GitHub update check control. */
+.footer-build-info {
+  display:flex; flex:0 0 auto; flex-direction:column; align-items:center;
+  justify-content:center; gap:3px; min-width:30px;
+}
+.footer-build-info .footer-version {
+  font-size:10px; line-height:1.15; letter-spacing:.01em;
+}
+.check-updates-button {
+  display:grid; place-items:center; width:21px; height:21px; min-width:21px;
+  padding:0; border:1px solid transparent; border-radius:7px;
+  background:transparent; color:#8589a4; cursor:pointer;
+  transition:color .15s,background .15s,border-color .15s,transform .15s;
+}
+.check-updates-button svg {
+  display:block; width:14px; height:14px; fill:none; stroke:currentColor;
+  stroke-width:1.65; stroke-linecap:round; stroke-linejoin:round;
+}
+.check-updates-button:hover:not(:disabled) {
+  color:#5d51df; background:#f0efff; border-color:#e2dfff;
+}
+.check-updates-button:focus-visible {
+  outline:2px solid #9188ff; outline-offset:2px;
+}
+.check-updates-button:disabled { cursor:wait; opacity:.7; }
+.check-updates-button.is-checking svg { animation: updateCheckSpin .8s linear infinite; }
+@keyframes updateCheckSpin { to { transform:rotate(360deg); } }
