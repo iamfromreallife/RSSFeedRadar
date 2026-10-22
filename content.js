@@ -21,6 +21,18 @@
     } catch (_) { return null; }
   };
   const looksLikeFeedUrl = (raw) => /(?:\.rss(?:$|[?#])|\.atom(?:$|[?#])|\/(?:feed|rss|atom)(?:\.xml)?(?:\/|$|[?#])|\/(?:feed|rss|atom)[-_][^/?#]+\.xml(?:$|[?#])|\.rss\.xml(?:$|[?#])|[?&](?:format|output)=(?:rss|atom|xml|json))/i.test(raw || '');
+  // YouTube's Subscriptions page is a signed-in HTML view, not an RSS endpoint.
+  // Public YouTube RSS feeds are channel-specific: /feeds/videos.xml?channel_id=UC...
+  const isYouTubeSubscriptionsPageUrl = (raw) => {
+    try {
+      const url = new URL(raw, location.href);
+      const host = url.hostname.toLowerCase().replace(/^www\\./, '');
+      return host === 'youtube.com' && (
+        /^\\/feed\\/subscriptions\\/?$/i.test(url.pathname) ||
+        /^\\/subscription_manager\\/?$/i.test(url.pathname)
+      );
+    } catch (_) { return false; }
+  };
   const hasFeedType = (type) => /(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|feed\+json|jsonfeed|rdf\+xml|xml)|text\/(?:rss|xml))/i.test(type || '');
 
   function inferredTitle(url, context = '') {
@@ -39,7 +51,7 @@
     const seen = new Set();
     const add = (raw, label) => {
       const url = normalizeUrl(raw);
-      if (!url || url === normalizeUrl(location.href) || seen.has(url) || candidates.length >= MAX_CANDIDATES) return;
+      if (!url || isYouTubeSubscriptionsPageUrl(url) || url === normalizeUrl(location.href) || seen.has(url) || candidates.length >= MAX_CANDIDATES) return;
       seen.add(url);
       candidates.push({ url, title: tidy(label, 140) || inferredTitle(url), source: 'known' });
     };
@@ -114,7 +126,9 @@
         const match = document.documentElement?.innerHTML?.slice(0, 700000).match(/"channelId"\s*:\s*"(UC[\w-]{20,})"/);
         if (match) channelId = match[1];
       }
-      if (channelId) add(`https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`, 'YouTube channel feed');
+      // On the aggregate subscriptions page, HTML contains many channel IDs. Picking the first
+      // one would silently represent just one channel as the entire subscriptions feed.
+      if (channelId && !isYouTubeSubscriptionsPageUrl(location.href)) add(`https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`, 'YouTube channel feed');
     }
 
     // GitHub repository release and commit pages expose Atom feeds.
@@ -147,7 +161,7 @@
     const pageTitle = tidy(document.title || location.hostname, 140) || location.hostname;
     const add = (raw, title, kind) => {
       const url = normalizeUrl(raw);
-      if (!url || (kind !== 'document' && url === normalizeUrl(location.href)) || seen.has(url) || feeds.length >= MAX_DIRECT_FEEDS) return;
+      if (!url || isYouTubeSubscriptionsPageUrl(url) || (kind !== 'document' && url === normalizeUrl(location.href)) || seen.has(url) || feeds.length >= MAX_DIRECT_FEEDS) return;
       seen.add(url);
       feeds.push({
         url,
