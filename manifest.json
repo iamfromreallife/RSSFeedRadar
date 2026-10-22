@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "RSS Feed Radar",
-  "version": "1.4.1",
-  "description": "Discover website feeds and subscribe in seconds.",
+  "version": "1.5.1",
+  "description": "Discover feeds from the current page and across the website domain.",
   "minimum_chrome_version": "110",
   "permissions": [
     "storage",
