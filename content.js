@@ -177,7 +177,7 @@
     const pageTitle = tidy(document.title || location.hostname, 140) || location.hostname;
     const add = (raw, title, kind) => {
       const url = normalizeUrl(raw);
-      if (!url || isYouTubeSubscriptionsPageUrl(url) || (kind !== 'document' && url === normalizeUrl(location.href)) || seen.has(url) || feeds.length >= MAX_DIRECT_FEEDS) return;
+      if (!url || isOEmbedUrl(url) || isYouTubeSubscriptionsPageUrl(url) || (kind !== 'document' && url === normalizeUrl(location.href)) || seen.has(url) || feeds.length >= MAX_DIRECT_FEEDS) return;
       seen.add(url);
       feeds.push({
         url,
