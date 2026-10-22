@@ -551,3 +551,81 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   rescanInFlight.delete(tabId);
   chrome.storage.session.remove(stateKey(tabId)).catch(() => {});
 });
+
+
+// Repository update checker: poll on startup/install and every four hours.
+const UPDATE_CHECK_ALARM = 'rss-feed-radar-repository-update-check';
+const UPDATE_REPO_API = 'https://api.github.com/repos/iamfromreallife/RSSFeedRadar/commits?per_page=1';
+const UPDATE_REPO_PAGE = 'https://github.com/iamfromreallife/RSSFeedRadar';
+const UPDATE_STORAGE_KEY = 'rssFeedRadarUpdateState';
+const UPDATE_CHECK_INTERVAL_MINUTES = 4 * 60;
+
+async function checkRepositoryForUpdates() {
+  try {
+    const response = await fetch(UPDATE_REPO_API, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: { Accept: 'application/vnd.github+json' }
+    });
+    if (!response.ok) throw new Error(`GitHub returned HTTP ${response.status}`);
+    const commits = await response.json();
+    const latest = Array.isArray(commits) ? commits[0] : null;
+    if (!latest?.sha) throw new Error('GitHub did not return a latest commit SHA');
+
+    const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY);
+    const prior = stored[UPDATE_STORAGE_KEY] || {};
+    const updateAvailable = Boolean(prior.baselineCommit && prior.baselineCommit !== latest.sha);
+    const state = {
+      baselineCommit: prior.baselineCommit || latest.sha,
+      latestCommit: latest.sha,
+      latestMessage: String(latest.commit?.message || '').split('\n')[0].slice(0, 160),
+      latestDate: latest.commit?.committer?.date || latest.commit?.author?.date || '',
+      checkedAt: Date.now(),
+      updateAvailable,
+      previousCommit: prior.baselineCommit || ''
+    };
+    await chrome.storage.local.set({ [UPDATE_STORAGE_KEY]: state });
+    try { chrome.runtime.sendMessage({ type: 'REPOSITORY_UPDATE_STATE', state }).catch(() => {}); } catch (_) {}
+  } catch (error) {
+    const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY).catch(() => ({}));
+    const prior = stored[UPDATE_STORAGE_KEY] || {};
+    await chrome.storage.local.set({
+      [UPDATE_STORAGE_KEY]: { ...prior, checkedAt: Date.now(), lastCheckError: String(error?.message || error).slice(0, 180) }
+    }).catch(() => {});
+  }
+}
+
+async function ensureUpdateCheckAlarm() {
+  const existing = await chrome.alarms.get(UPDATE_CHECK_ALARM).catch(() => null);
+  if (!existing) {
+    chrome.alarms.create(UPDATE_CHECK_ALARM, { delayInMinutes: 0.1, periodInMinutes: UPDATE_CHECK_INTERVAL_MINUTES });
+  }
+}
+chrome.runtime.onInstalled.addListener(() => {
+  ensureUpdateCheckAlarm().catch(() => {});
+  checkRepositoryForUpdates().catch(() => {});
+});
+chrome.runtime.onStartup.addListener(() => {
+  ensureUpdateCheckAlarm().catch(() => {});
+  checkRepositoryForUpdates().catch(() => {});
+});
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === UPDATE_CHECK_ALARM) checkRepositoryForUpdates().catch(() => {});
+});
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === 'GET_UPDATE_STATE') {
+    chrome.storage.local.get(UPDATE_STORAGE_KEY)
+      .then((stored) => sendResponse(stored[UPDATE_STORAGE_KEY] || { updateAvailable: false, checkedAt: 0 }))
+      .catch(() => sendResponse({ updateAvailable: false, checkedAt: 0 }));
+    return true;
+  }
+  if (message?.type === 'CHECK_UPDATES_NOW') {
+    checkRepositoryForUpdates().then(async () => {
+      const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY);
+      sendResponse(stored[UPDATE_STORAGE_KEY] || { updateAvailable: false, checkedAt: Date.now() });
+    }).catch(() => sendResponse({ updateAvailable: false, checkedAt: Date.now() }));
+    return true;
+  }
+  return false;
+});
+ensureUpdateCheckAlarm().catch(() => {});
