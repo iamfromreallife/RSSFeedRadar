@@ -246,7 +246,7 @@ function isYouTubeSubscriptionsPageUrl(raw) {
   try {
     const url = new URL(raw);
     const host = url.hostname.toLowerCase().replace(/^www\./, '');
-    return host === 'youtube.com' && (/^\/feed(?:\/|$)/i.test(url.pathname) || /^\/subscription_manager\/?$/i.test(url.pathname));
+    return ['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host) && (/^\/feed(?:\/|$)/i.test(url.pathname) || /^\/subscription_manager\/?$/i.test(url.pathname));
   } catch (_) { return false; }
 }
 
