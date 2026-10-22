@@ -24,13 +24,22 @@ function safeUrl(raw) {
   } catch (_) { return null; }
 }
 
+function isYouTubeNavigationFeedUrl(raw) {
+  try {
+    const url = new URL(raw);
+    const host = url.hostname.toLowerCase().replace(/^www\./, '');
+    return ['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host)
+      && (/^\/feed(?:\/|$)/i.test(url.pathname) || /^\/subscription_manager\/?$/i.test(url.pathname));
+  } catch (_) { return false; }
+}
+
 function cleanFeeds(items, fallbackTitle = 'Website feed') {
   const seen = new Set();
   const cleaned = [];
   for (const item of Array.isArray(items) ? items : []) {
     if (cleaned.length >= 100) break;
     const url = safeUrl(item?.url);
-    if (!url || seen.has(url)) continue;
+    if (!url || isYouTubeNavigationFeedUrl(url) || seen.has(url)) continue;
     seen.add(url);
     cleaned.push({
       url,
