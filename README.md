@@ -1,6 +1,6 @@
 # RSS Feed Radar — RSS & Feed Finder
 
-A Manifest V3 Chrome extension that discovers RSS, Atom, and JSON Feed links on the active page, displays the number of discovered feeds on the toolbar icon, and opens a rich preview for each feed.
+A Manifest V3 Chrome extension that discovers RSS, Atom, and JSON Feed links on the active page, displays the number of discovered feeds on the toolbar icon, and opens a rich preview for each feed with various subscribing options.
 
 ## Features
 
