@@ -28,7 +28,7 @@
       const url = new URL(raw, location.href);
       const host = url.hostname.toLowerCase().replace(/^www\./, '');
       return host === 'youtube.com' && (
-        /^\/feed\/subscriptions\/?$/i.test(url.pathname) ||
+        /^\/feed(?:\/|$)/i.test(url.pathname) ||
         /^\/subscription_manager\/?$/i.test(url.pathname)
       );
     } catch (_) { return false; }
