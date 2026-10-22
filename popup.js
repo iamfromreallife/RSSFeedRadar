@@ -275,8 +275,13 @@ async function syncUpdateAvailability() {
   try {
     const state = await chrome.runtime.sendMessage({ type: 'GET_UPDATE_STATE' });
     if (updateAvailableButton) {
-      updateAvailableButton.hidden = !state?.updateAvailable;
-      if (state?.latestMessage) updateAvailableButton.title = state.latestMessage;
+      const installedVersion = chrome.runtime.getManifest().version;
+      // Ignore stale state left by an older checker/schema until the remote manifest
+      // has been checked for this installed version.
+      const stateMatchesInstall = state?.installedVersion === installedVersion
+        && typeof state?.latestVersion === 'string';
+      updateAvailableButton.hidden = !(stateMatchesInstall && state.updateAvailable);
+      if (state?.latestVersion) updateAvailableButton.title = `Installed ${installedVersion} · Latest ${state.latestVersion}`;
     }
   } catch (_) {
     if (updateAvailableButton) updateAvailableButton.hidden = true;
