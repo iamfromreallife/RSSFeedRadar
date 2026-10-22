@@ -27,7 +27,7 @@
     try {
       const url = new URL(raw, location.href);
       const host = url.hostname.toLowerCase().replace(/^www\./, '');
-      return host === 'youtube.com' && (
+      return ['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host) && (
         /^\/feed(?:\/|$)/i.test(url.pathname) ||
         /^\/subscription_manager\/?$/i.test(url.pathname)
       );
