@@ -720,3 +720,110 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === UPDATE_CHECK_ALARM) checkRepositoryForUpdates({ force: true }).catch(() => {});
 });
 ensureUpdateCheckAlarm().catch(() => {});
+
+
+// Optional default RSS previewer. When enabled, observe top-level navigations and
+// redirect confirmed feed MIME types (or clearly feed-like XML/JSON URLs) into
+// the internal reader before Chrome displays the raw document.
+const DEFAULT_PREVIEWER_STORAGE_KEY = 'rssFeedRadarDefaultPreviewer';
+const latestMainFrameRequestByTab = new Map();
+const handledFeedRequestIds = new Map();
+
+function feedPathHint(url) {
+  const path = decodeURIComponent(url.pathname || '').toLowerCase();
+  const params = url.searchParams;
+  const hasFeedQuery = ['feed', 'format', 'output', 'type'].some((key) =>
+    /^(?:rss2?|atom|json|jsonfeed)$/i.test(params.get(key) || '')
+  );
+  return hasFeedQuery
+    || /\.(?:rss|atom|rdf)(?:\.xml)?$/i.test(path)
+    || /(?:^|\/)feeds?(?:\/|$)/i.test(path)
+    || /(?:^|\/)(?:feed|rss|atom)(?:\.xml)?\/?$/i.test(path)
+    || /(?:^|\/)(?:feed|rss|atom|channel|posts?)[-_][^/]+\.xml$/i.test(path)
+    || /\.(?:feed|rss|atom)\.json$/i.test(path);
+}
+
+function isSupportedFeedNavigation(details) {
+  if (details.type !== 'main_frame' || details.tabId < 0) return false;
+  let url;
+  try { url = new URL(details.url); } catch (_) { return false; }
+  if (!['http:', 'https:'].includes(url.protocol)) return false;
+  if (isOEmbedUrl(url.href) || isYouTubeNavigationFeedUrl(url.href)) return false;
+
+  const headers = Array.isArray(details.responseHeaders) ? details.responseHeaders : [];
+  const header = (name) => headers.find((entry) => String(entry.name || '').toLowerCase() === name)?.value || '';
+  const mime = String(header('content-type')).split(';')[0].trim().toLowerCase();
+  const disposition = String(header('content-disposition')).toLowerCase();
+  const explicitFeedMime = /^(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|rdf\+xml|feed\+json|jsonfeed)|text\/(?:rss|atom))$/.test(mime);
+  if (explicitFeedMime) return true;
+
+  // Generic XML/JSON MIME types are only accepted when the URL itself looks
+  // feed-specific; this avoids intercepting sitemaps and generic API responses.
+  const pathHint = feedPathHint(url);
+  const genericXml = /^(?:application\/xml|text\/xml|application\/x-xml)$/.test(mime);
+  const genericJson = /^(?:application\/json|text\/json)$/.test(mime);
+  const plainText = /^text\/plain$/.test(mime);
+  const attachmentFeedName = /filename\*?=[^;]*\.(?:rss|atom|rdf)(?:\.xml)?(?:["';]|$)/i.test(disposition);
+  return attachmentFeedName || (pathHint && (
+    genericXml
+    || genericJson
+    || plainText
+    || /\.(?:rss|atom|rdf)(?:\.xml)?$/i.test(url.pathname)
+    || /(?:application\/octet-stream)/i.test(mime)
+  ));
+}
+
+function feedPreviewTitle(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    const path = decodeURIComponent(url.pathname).split('/').filter(Boolean).pop() || '';
+    const clean = path.replace(/\.(?:rss|atom|rdf|xml|json)$/i, '').replace(/[-_]+/g, ' ').trim();
+    return clean ? clean + ' — ' + url.hostname.replace(/^www\./i, '') : url.hostname.replace(/^www\./i, '') + ' RSS feed';
+  } catch (_) { return 'RSS feed'; }
+}
+
+chrome.webRequest.onBeforeRequest.addListener((details) => {
+  if (details.type !== 'main_frame' || details.tabId < 0) return;
+  latestMainFrameRequestByTab.set(details.tabId, {
+    requestId: details.requestId,
+    url: details.url,
+    startedAt: Date.now()
+  });
+}, { urls: ['http://*/*', 'https://*/*'], types: ['main_frame'] });
+
+chrome.webRequest.onHeadersReceived.addListener((details) => {
+  if (!isSupportedFeedNavigation(details)) return;
+
+  // Keep the map bounded and do not let a late header event steal a tab that has
+  // already navigated somewhere else.
+  const now = Date.now();
+  for (const [id, time] of handledFeedRequestIds) {
+    if (now - time > 60_000) handledFeedRequestIds.delete(id);
+  }
+  if (handledFeedRequestIds.has(details.requestId)) return;
+  const currentRequest = latestMainFrameRequestByTab.get(details.tabId);
+  if (currentRequest && currentRequest.requestId !== details.requestId) return;
+
+  chrome.storage.local.get(DEFAULT_PREVIEWER_STORAGE_KEY).then(async (stored) => {
+    if (stored[DEFAULT_PREVIEWER_STORAGE_KEY] !== true) return;
+    const latestRequest = latestMainFrameRequestByTab.get(details.tabId);
+    if (latestRequest && latestRequest.requestId !== details.requestId) return;
+    if (handledFeedRequestIds.has(details.requestId)) return;
+
+    const feedUrl = safeUrl(details.url);
+    if (!feedUrl || isOEmbedUrl(feedUrl) || isYouTubeNavigationFeedUrl(feedUrl)) return;
+    handledFeedRequestIds.set(details.requestId, Date.now());
+
+    const params = new URLSearchParams({ url: feedUrl, title: feedPreviewTitle(feedUrl) });
+    const readerUrl = chrome.runtime.getURL('reader.html?' + params.toString());
+    try {
+      await chrome.tabs.update(details.tabId, { url: readerUrl });
+    } catch (_) {
+      handledFeedRequestIds.delete(details.requestId);
+    }
+  }).catch(() => {});
+}, { urls: ['http://*/*', 'https://*/*'], types: ['main_frame'] }, ['responseHeaders']);
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  latestMainFrameRequestByTab.delete(tabId);
+});
