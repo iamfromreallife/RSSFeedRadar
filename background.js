@@ -24,6 +24,19 @@ function safeUrl(raw) {
   } catch (_) { return null; }
 }
 
+function isOEmbedUrl(raw) {
+  try {
+    const url = new URL(raw);
+    const route = decodeURIComponent(url.pathname).toLowerCase();
+    const restRoute = (url.searchParams.get('rest_route') || '').toLowerCase();
+    return /(?:^|\/)oembed(?:\/|\.|$)/i.test(route)
+      || /(?:^|\/)oembed(?:\/|$)/i.test(restRoute)
+      || (/\/(?:embed|oembed)\/?$/i.test(route)
+        && url.searchParams.has('url')
+        && (url.searchParams.has('format') || /\.(?:xml|json)$/i.test(url.pathname)));
+  } catch (_) { return /(?:wp-json\/oembed|oembed\/1\.0\/embed)/i.test(String(raw || '')); }
+}
+
 function isYouTubeNavigationFeedUrl(raw) {
   try {
     const url = new URL(raw);
@@ -39,7 +52,7 @@ function cleanFeeds(items, fallbackTitle = 'Website feed') {
   for (const item of Array.isArray(items) ? items : []) {
     if (cleaned.length >= 100) break;
     const url = safeUrl(item?.url);
-    if (!url || isYouTubeNavigationFeedUrl(url) || seen.has(url)) continue;
+    if (!url || isOEmbedUrl(url) || isYouTubeNavigationFeedUrl(url) || seen.has(url)) continue;
     seen.add(url);
     cleaned.push({
       url,
@@ -152,11 +165,12 @@ function parseHtmlAttributes(tag) {
 }
 
 function isFeedishUrl(raw) {
+  if (!raw || isOEmbedUrl(raw)) return false;
   return /(?:\.rss(?:$|[?#])|\.atom(?:$|[?#])|\.rdf(?:$|[?#])|\.xml(?:$|[?#])|\/feeds?(?:\.xml)?(?:\/|$|[?#])|\/rss(?:\.xml)?(?:\/|$|[?#])|\/atom(?:\.xml)?(?:\/|$|[?#])|\.json(?:$|[?#])|[?&](?:format|output|feed)=(?:rss2?|atom|xml|json))/i.test(String(raw || ''));
 }
 
 function isFeedMimeType(raw) {
-  return /(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|feed\+json|jsonfeed|rdf\+xml)|text\/(?:rss|xml))/i.test(String(raw || ''));
+  return /(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|feed\+json|jsonfeed|rdf\+xml)|text\/(?:rss|atom))/i.test(String(raw || ''));
 }
 
 function extractHomepageFeedCandidates(html, baseUrl) {
@@ -165,7 +179,7 @@ function extractHomepageFeedCandidates(html, baseUrl) {
   const add = (rawUrl, title) => {
     try {
       const url = new URL(rawUrl, baseUrl);
-      if (!['http:', 'https:'].includes(url.protocol)) return;
+      if (!['http:', 'https:'].includes(url.protocol) || isOEmbedUrl(url.href)) return;
       url.hash = '';
       if (seen.has(url.href) || result.length >= 12) return;
       seen.add(url.href);
@@ -335,7 +349,7 @@ async function getDomainFeeds(pageUrl) {
 
 async function validateCandidate(candidate) {
   const url = safeUrl(candidate?.url);
-  if (!url) return null;
+  if (!url || isOEmbedUrl(url)) return null;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 4200);
   try {
@@ -404,7 +418,7 @@ async function processDiscovery(tabId, message) {
   const pageCandidates = (Array.isArray(message.candidates) ? message.candidates : [])
     .slice(0, 12)
     .map((item) => ({ url: safeUrl(item?.url), title: String(item?.title || 'Website feed').slice(0, 160) }))
-    .filter((item) => item.url && !already.has(item.url));
+    .filter((item) => item.url && !isOEmbedUrl(item.url) && !already.has(item.url));
 
   // Domain-wide discovery runs on every site except Reddit. Reddit's anonymous
   // RSS endpoint is aggressively rate-limited, so broad endpoint probing can
