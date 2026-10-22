@@ -113,7 +113,7 @@
         </section>
         <div id="articlesPanel" role="tabpanel">
         <div id="loadingState" class="loading-state" aria-live="polite"><span class="loader"></span><span data-i18n="loadingArticles">Gathering stories and images…</span></div>
-        <div id="errorState" class="message-panel" hidden><div class="message-icon">!</div><h3 data-i18n="feedUnavailableTitle">This feed couldn’t be opened</h3><p id="errorMessage" data-i18n="feedUnavailableBody">The source may be temporarily unavailable, or it may block direct access. You can still copy its URL or open it in your reader.</p><button id="retryButton" class="retry-button" type="button" data-i18n="tryAgain">Try again</button></div>
+        <div id="errorState" class="message-panel" hidden><div class="message-icon">!</div><h3 id="errorTitle" data-i18n="feedUnavailableTitle">This feed couldn’t be opened</h3><p id="errorMessage" data-i18n="feedUnavailableBody">The source may be temporarily unavailable, or it may block direct access. You can still copy its URL or open it in your reader.</p><button id="retryButton" class="retry-button" type="button" data-i18n="tryAgain">Try again</button></div>
         <div id="emptyState" class="message-panel" hidden><div class="message-icon">✦</div><h3 data-i18n="noStoriesTitle">The feed is connected, but quiet</h3><p data-i18n="noStoriesBody">We could read the feed details, but it didn’t contain any story entries to preview.</p></div>
         <div id="storiesGrid" class="stories-grid" aria-live="polite"></div>
         <div id="sourceNote" class="source-note" hidden><span class="source-note-mark">✓</span><span data-i18n="sourceNote">Select a story to read its feed text in a preview window.</span></div>

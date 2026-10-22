@@ -373,6 +373,17 @@ async function getTabFeeds(tabId) {
   return result[stateKey(tabId)] || { feeds: [], pageUrl: '', updatedAt: 0 };
 }
 
+function isRedditUrl(raw) {
+  try { return /(^|\.)reddit\.com$/i.test(new URL(raw).hostname); } catch (_) { return false; }
+}
+
+function isRedditFeedUrl(raw) {
+  try {
+    const url = new URL(raw);
+    return isRedditUrl(url.href) && /(?:\.rss|\.atom)$/i.test(url.pathname);
+  } catch (_) { return false; }
+}
+
 async function processDiscovery(tabId, message) {
   const revision = (latestRevision.get(tabId) || 0) + 1;
   latestRevision.set(tabId, revision);
@@ -386,15 +397,23 @@ async function processDiscovery(tabId, message) {
     .map((item) => ({ url: safeUrl(item?.url), title: String(item?.title || 'Website feed').slice(0, 160) }))
     .filter((item) => item.url && !already.has(item.url));
 
-  // Domain-wide discovery runs on every site, regardless of CMS or current
-  // path: it checks common feed endpoints and parses feed links from the root
-  // homepage. Results are cached for 15 minutes per origin.
-  const domainFeedsPromise = getDomainFeeds(pageUrl).catch(() => []);
-  const pageFeedsPromise = validateCandidates(pageCandidates, 6);
+  // Domain-wide discovery runs on every site except Reddit. Reddit's anonymous
+  // RSS endpoint is aggressively rate-limited, so broad endpoint probing can
+  // consume the request budget before the user opens the preview.
+  const redditPage = isRedditUrl(pageUrl);
+  const redditCandidates = pageCandidates.filter((item) => isRedditFeedUrl(item.url));
+  const candidatesToValidate = pageCandidates.filter((item) => !isRedditFeedUrl(item.url));
+  const domainFeedsPromise = redditPage ? Promise.resolve([]) : getDomainFeeds(pageUrl).catch(() => []);
+  const pageFeedsPromise = validateCandidates(candidatesToValidate, 6);
   const [domainFeeds, verifiedPageFeeds] = await Promise.all([domainFeedsPromise, pageFeedsPromise]);
   if (latestRevision.get(tabId) !== revision) return { ok: true, stale: true };
 
-  const combined = [...direct, ...domainFeeds, ...verifiedPageFeeds];
+  const unverifiedRedditFeeds = redditCandidates.map((item) => ({
+    ...item,
+    title: String(item.title || 'Reddit RSS feed').replace(/\s+/g, ' ').trim().slice(0, 160),
+    source: 'known'
+  }));
+  const combined = [...direct, ...unverifiedRedditFeeds, ...domainFeeds, ...verifiedPageFeeds];
   const merged = [];
   const used = new Set();
   for (const item of combined) {
