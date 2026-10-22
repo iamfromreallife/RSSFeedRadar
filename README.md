@@ -20,7 +20,7 @@ A Manifest V3 Chrome extension that discovers RSS, Atom, and JSON Feed links on 
 1. Extract the ZIP to a permanent folder.
 2. Open `chrome://extensions`.
 3. Enable **Developer mode**.
-4. Select **Load unpacked** and choose the `rss_feed_radar_extension` folder.
+4. Select **Load unpacked** and choose the `RSSFeedRadar-main` folder.
 5. Pin **RSS Feed Radar** from Chrome’s Extensions menu.
 
 Chrome requests access to HTTP and HTTPS pages because the extension inspects pages to discover feeds and validate common feed endpoints. It does not modify website content.
