@@ -266,10 +266,21 @@ chrome.runtime.onMessage.addListener((message) => {
     syncLanguageDropdown();
   }
   applyTranslations();
-  await syncUpdateAvailability();
+  await checkUpdatesOnPopupOpen();
   await loadCurrentTab();
 })();
 
+
+async function checkUpdatesOnPopupOpen() {
+  try {
+    // Check the manifest whenever the popup opens so a newly published version
+    // becomes visible immediately rather than waiting for the four-hour alarm.
+    await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW' });
+  } catch (_) {
+    // Keep the popup usable if GitHub is temporarily unavailable.
+  }
+  await syncUpdateAvailability();
+}
 
 async function syncUpdateAvailability() {
   try {
