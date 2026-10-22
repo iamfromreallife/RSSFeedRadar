@@ -126,8 +126,7 @@
         const match = document.documentElement?.innerHTML?.slice(0, 700000).match(/"channelId"\s*:\s*"(UC[\w-]{20,})"/);
         if (match) channelId = match[1];
       }
-      // On the aggregate subscriptions page, HTML contains many channel IDs. Picking the first
-      // one would silently represent just one channel as the entire subscriptions feed.
+      // The subscriptions page contains many channel IDs; picking the first would misrepresent one channel as the full subscriptions feed.
       if (channelId && !isYouTubeSubscriptionsPageUrl(location.href)) add(`https://www.youtube.com/feeds/videos.xml?channel_id=${encodeURIComponent(channelId)}`, 'YouTube channel feed');
     }
 

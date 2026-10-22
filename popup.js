@@ -284,8 +284,6 @@ function renderUpdateAvailability(state) {
 
 async function checkUpdatesOnPopupOpen() {
   try {
-    // Render the exact response from the fresh GitHub check instead of racing a
-    // second storage read against the network response.
     const state = await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW' });
     renderUpdateAvailability(state);
   } catch (_) {

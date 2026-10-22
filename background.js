@@ -471,8 +471,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  // Keep update messages in the same listener as feed messages so the popup has
-  // one deterministic response path rather than relying on competing listeners.
   if (message?.type === 'GET_UPDATE_STATE') {
     chrome.storage.local.get(UPDATE_STORAGE_KEY)
       .then((stored) => sendResponse(stored[UPDATE_STORAGE_KEY] || { updateAvailable: false, checkedAt: 0 }))
@@ -577,8 +575,8 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 
-// Repository update checker: compare the installed version with manifest.json on GitHub.
-// Commits that do not bump the manifest version are not user-facing extension updates.
+// Repository update checker: compare the installed version against the live GitHub manifest.
+// A fresh request is made on popup open; a periodic alarm and startup/install checks remain enabled.
 const UPDATE_CHECK_ALARM = 'rss-feed-radar-repository-update-check';
 const UPDATE_REPO_MANIFEST_URL = 'https://raw.githubusercontent.com/iamfromreallife/RSSFeedRadar/main/manifest.json';
 const UPDATE_STORAGE_KEY = 'rssFeedRadarUpdateState';
@@ -607,7 +605,7 @@ async function fetchRemoteManifest() {
   const apiUrl = `https://api.github.com/repos/iamfromreallife/RSSFeedRadar/contents/manifest.json?ref=main&_=${cacheToken}`;
   let apiError = null;
 
-  // Prefer the Contents API with a unique URL to avoid stale raw-file CDN responses.
+  // Prefer GitHub's Contents API with a unique URL to avoid stale raw-file CDN responses.
   try {
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -617,7 +615,7 @@ async function fetchRemoteManifest() {
     if (!response.ok) throw new Error(`GitHub API returned HTTP ${response.status}`);
     const payload = await response.json();
     if (payload?.content) {
-      const binary = atob(String(payload.content).replace(/\\s/g, ''));
+      const binary = atob(String(payload.content).replace(/\s/g, ''));
       const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
       return JSON.parse(new TextDecoder().decode(bytes));
     }
@@ -645,8 +643,8 @@ async function checkRepositoryForUpdates(options = {}) {
   const installedVersion = chrome.runtime.getManifest().version;
   const existing = await chrome.storage.local.get(UPDATE_STORAGE_KEY).catch(() => ({}));
   const previous = existing[UPDATE_STORAGE_KEY] || {};
-  // Avoid API requests each time the popup is opened repeatedly. Startup, alarms,
-  // and the small manual refresh button can force a fresh check.
+  // Avoid excessive API requests when the popup is opened repeatedly. Startup,
+  // alarms and manual refresh can force a fresh comparison.
   const recentSuccessfulCheck = previous.checkerSchema === UPDATE_CHECK_SCHEMA
     && previous.installedVersion === installedVersion
     && typeof previous.latestVersion === 'string'
@@ -670,9 +668,7 @@ async function checkRepositoryForUpdates(options = {}) {
       repository: 'https://github.com/iamfromreallife/RSSFeedRadar'
     };
     await chrome.storage.local.set({ [UPDATE_STORAGE_KEY]: state });
-    try {
-      chrome.runtime.sendMessage({ type: 'REPOSITORY_UPDATE_STATE', state }).catch(() => {});
-    } catch (_) {}
+    try { chrome.runtime.sendMessage({ type: 'REPOSITORY_UPDATE_STATE', state }).catch(() => {}); } catch (_) {}
     return state;
   } catch (error) {
     const state = {
@@ -686,21 +682,17 @@ async function checkRepositoryForUpdates(options = {}) {
       lastCheckError: String(error?.message || error).slice(0, 180)
     };
     await chrome.storage.local.set({ [UPDATE_STORAGE_KEY]: state }).catch(() => {});
-    try {
-      chrome.runtime.sendMessage({ type: 'REPOSITORY_UPDATE_STATE', state }).catch(() => {});
-    } catch (_) {}
+    try { chrome.runtime.sendMessage({ type: 'REPOSITORY_UPDATE_STATE', state }).catch(() => {}); } catch (_) {}
     return state;
   }
 }
 
 async function ensureUpdateCheckAlarm() {
   const existing = await chrome.alarms.get(UPDATE_CHECK_ALARM).catch(() => null);
-  if (!existing) {
-    chrome.alarms.create(UPDATE_CHECK_ALARM, {
-      delayInMinutes: 0.1,
-      periodInMinutes: UPDATE_CHECK_INTERVAL_MINUTES
-    });
-  }
+  if (!existing) chrome.alarms.create(UPDATE_CHECK_ALARM, {
+    delayInMinutes: 0.1,
+    periodInMinutes: UPDATE_CHECK_INTERVAL_MINUTES
+  });
 }
 chrome.runtime.onInstalled.addListener(() => {
   ensureUpdateCheckAlarm().catch(() => {});

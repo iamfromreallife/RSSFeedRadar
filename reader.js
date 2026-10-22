@@ -246,7 +246,10 @@ function isYouTubeSubscriptionsPageUrl(raw) {
   try {
     const url = new URL(raw);
     const host = url.hostname.toLowerCase().replace(/^www\./, '');
-    return ['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host) && (/^\/feed(?:\/|$)/i.test(url.pathname) || /^\/subscription_manager\/?$/i.test(url.pathname));
+    return ['youtube.com', 'm.youtube.com', 'music.youtube.com'].includes(host) && (
+      /^\/feed(?:\/|$)/i.test(url.pathname) ||
+      /^\/subscription_manager\/?$/i.test(url.pathname)
+    );
   } catch (_) { return false; }
 }
 
@@ -417,6 +420,7 @@ async function fetchFeed() {
   feedDescriptionEl.textContent = translate('loadingFeed');
 
   // YouTube's subscriptions route is an authenticated HTML page, not an RSS feed.
+  // Guard against stale or manually supplied preview URLs instead of surfacing a misleading HTTP 401.
   if (isYouTubeSubscriptionsPageUrl(feedUrl)) {
     loadingState.hidden = true;
     errorState.hidden = false;
