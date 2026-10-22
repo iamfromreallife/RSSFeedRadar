@@ -579,7 +579,7 @@ function compareExtensionVersions(remoteVersion, installedVersion) {
 
 async function checkRepositoryForUpdates() {
   try {
-    const response = await fetch(UPDATE_REPO_MANIFEST_URL, {
+    const response = await fetch(`${UPDATE_REPO_MANIFEST_URL}?_=${Date.now()}`, {
       method: 'GET',
       cache: 'no-store',
       headers: { Accept: 'application/json, text/plain;q=0.9' }
