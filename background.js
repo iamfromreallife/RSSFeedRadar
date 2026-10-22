@@ -553,54 +553,79 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 
-// Repository update checker: poll on startup/install and every four hours.
+// Repository update checker: compare the installed version with manifest.json on GitHub.
+// Commits that do not bump the manifest version are not user-facing extension updates.
 const UPDATE_CHECK_ALARM = 'rss-feed-radar-repository-update-check';
-const UPDATE_REPO_API = 'https://api.github.com/repos/iamfromreallife/RSSFeedRadar/commits?per_page=1';
+const UPDATE_REPO_MANIFEST_URL = 'https://raw.githubusercontent.com/iamfromreallife/RSSFeedRadar/main/manifest.json';
 const UPDATE_STORAGE_KEY = 'rssFeedRadarUpdateState';
 const UPDATE_CHECK_INTERVAL_MINUTES = 4 * 60;
 
+function compareExtensionVersions(remoteVersion, installedVersion) {
+  const valid = /^\\d+(?:\\.\\d+){0,3}$/;
+  if (!valid.test(String(remoteVersion)) || !valid.test(String(installedVersion))) {
+    throw new Error('Invalid extension version in manifest');
+  }
+  const remote = String(remoteVersion).split('.').map(Number);
+  const installed = String(installedVersion).split('.').map(Number);
+  const length = Math.max(remote.length, installed.length);
+  for (let index = 0; index < length; index += 1) {
+    const a = remote[index] || 0;
+    const b = installed[index] || 0;
+    if (a > b) return 1;
+    if (a < b) return -1;
+  }
+  return 0;
+}
+
 async function checkRepositoryForUpdates() {
   try {
-    const response = await fetch(UPDATE_REPO_API, {
-      method: 'GET', cache: 'no-store',
-      headers: { Accept: 'application/vnd.github+json' }
+    const response = await fetch(UPDATE_REPO_MANIFEST_URL, {
+      method: 'GET',
+      cache: 'no-store',
+      headers: { Accept: 'application/json, text/plain;q=0.9' }
     });
     if (!response.ok) throw new Error(`GitHub returned HTTP ${response.status}`);
-    const commits = await response.json();
-    const latest = Array.isArray(commits) ? commits[0] : null;
-    if (!latest?.sha) throw new Error('GitHub did not return a latest commit SHA');
-
+    const remoteManifest = await response.json();
+    const latestVersion = String(remoteManifest?.version || '').trim();
+    if (!latestVersion) throw new Error('GitHub manifest has no version');
+    const installedVersion = chrome.runtime.getManifest().version;
+    const comparison = compareExtensionVersions(latestVersion, installedVersion);
     const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY);
     const prior = stored[UPDATE_STORAGE_KEY] || {};
-    const installedVersion = chrome.runtime.getManifest().version;
-    // A new installed extension version resets the baseline to the current repository head.
-    const resetBaseline = !prior.baselineCommit || prior.installedVersion !== installedVersion;
-    const baselineCommit = resetBaseline ? latest.sha : prior.baselineCommit;
-    const updateAvailable = !resetBaseline && baselineCommit !== latest.sha;
     const state = {
-      baselineCommit,
       installedVersion,
-      latestCommit: latest.sha,
-      latestMessage: String(latest.commit?.message || '').split('\n')[0].slice(0, 160),
-      latestDate: latest.commit?.committer?.date || latest.commit?.author?.date || '',
+      latestVersion,
       checkedAt: Date.now(),
-      updateAvailable,
-      previousCommit: prior.baselineCommit || ''
+      updateAvailable: comparison > 0,
+      current: comparison === 0,
+      repository: 'https://github.com/iamfromreallife/RSSFeedRadar'
     };
     await chrome.storage.local.set({ [UPDATE_STORAGE_KEY]: state });
-    try { chrome.runtime.sendMessage({ type: 'REPOSITORY_UPDATE_STATE', state }).catch(() => {}); } catch (_) {}
+    try {
+      chrome.runtime.sendMessage({ type: 'REPOSITORY_UPDATE_STATE', state }).catch(() => {});
+    } catch (_) {}
+    return state;
   } catch (error) {
     const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY).catch(() => ({}));
     const prior = stored[UPDATE_STORAGE_KEY] || {};
-    await chrome.storage.local.set({
-      [UPDATE_STORAGE_KEY]: { ...prior, checkedAt: Date.now(), lastCheckError: String(error?.message || error).slice(0, 180) }
-    }).catch(() => {});
+    const state = {
+      ...prior,
+      checkedAt: Date.now(),
+      lastCheckError: String(error?.message || error).slice(0, 180)
+    };
+    await chrome.storage.local.set({ [UPDATE_STORAGE_KEY]: state }).catch(() => {});
+    return state;
   }
 }
 
 async function ensureUpdateCheckAlarm() {
   const existing = await chrome.alarms.get(UPDATE_CHECK_ALARM).catch(() => null);
-  if (!existing) chrome.alarms.create(UPDATE_CHECK_ALARM, { delayInMinutes: 0.1, periodInMinutes: UPDATE_CHECK_INTERVAL_MINUTES });
+  if (!existing) {
+    chrome.alarms.create(UPDATE_CHECK_ALARM, {
+      delayInMinutes: 0.1,
+      periodInMinutes: UPDATE_CHECK_INTERVAL_MINUTES
+    });
+  }
 }
 chrome.runtime.onInstalled.addListener(() => {
   ensureUpdateCheckAlarm().catch(() => {});
@@ -621,10 +646,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message?.type === 'CHECK_UPDATES_NOW') {
-    checkRepositoryForUpdates().then(async () => {
-      const stored = await chrome.storage.local.get(UPDATE_STORAGE_KEY);
-      sendResponse(stored[UPDATE_STORAGE_KEY] || { updateAvailable: false, checkedAt: Date.now() });
-    }).catch(() => sendResponse({ updateAvailable: false, checkedAt: Date.now(), lastCheckError: 'Update check failed' }));
+    checkRepositoryForUpdates()
+      .then((state) => sendResponse(state || { updateAvailable: false, checkedAt: Date.now() }))
+      .catch(() => sendResponse({ updateAvailable: false, checkedAt: Date.now(), lastCheckError: 'Update check failed' }));
     return true;
   }
   return false;
