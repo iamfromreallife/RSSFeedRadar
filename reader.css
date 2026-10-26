@@ -824,3 +824,14 @@ body.dark-mode .font-select-control .font-select-option:focus-visible { outline-
   .story-count-inline strong { font-size:18px; }
   .subscribe-inline { margin-bottom:16px !important; }
 }
+
+
+/* Keep the article count on the same row, immediately before subscription actions. */
+.subscribe-inline .story-count-inline { margin:0 auto 0 0; flex:0 0 auto; justify-content:flex-start; text-align:left; }
+.subscribe-inline .story-count-inline strong { font-size:20px; }
+.subscribe-inline .story-count-inline span { font-size:9px; }
+.subscribe-inline .subscribe-inline-label { display:none !important; }
+@media(max-width:620px) {
+  .subscribe-inline .story-count-inline { margin-right:6px; }
+  .subscribe-inline .story-count-inline strong { font-size:18px; }
+}
