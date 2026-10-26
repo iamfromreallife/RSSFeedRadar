@@ -38,7 +38,15 @@
           <div><h2 id="storiesHeading" data-i18n="latestStories">Latest stories</h2><p id="storiesSubtitle" class="section-subtitle" data-i18n="storiesSubtitle">Recent articles, ready for a quick browse.</p></div>
           <div class="story-count"><strong id="storyCount">—</strong><span data-i18n="articlesLabel">ARTICLES</span></div>
         </div>
-        <div class="story-view-controls">
+          <div class="subscribe-inline"><span class="subscribe-inline-label" data-i18n="subscribeIn">Subscribe in</span><div class="dock-actions">
+      <button id="copyButton" class="action-button copy-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="10" height="11" rx="2"/><path d="M13 4H5a2 2 0 0 0-2 2v9"/></svg><span data-i18n="copyFeedUrl">Copy feed URL</span></button>
+      <button id="inoreaderButton" class="action-button inoreader-button" type="button"><span class="service-letter">I</span><span data-i18n="inoreader">Inoreader</span><svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M8 3h5v5M13 3 7 9"/></svg></button>
+      <button id="feedlyButton" class="action-button feedly-button" type="button"><span class="feedly-mark" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="feedly">Feedly</span><svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M8 3h5v5M13 3 7 9"/></svg></button>
+      <button id="newsblurButton" class="action-button extra-service-button newsblur-button" type="button"><span class="service-glyph">N</span><span data-i18n="newsblur">NewsBlur</span></button>
+      <button id="oldReaderButton" class="action-button extra-service-button oldreader-button" type="button"><span class="service-glyph">O</span><span data-i18n="oldReader">The Old Reader</span></button>
+      <button id="readwiseButton" class="action-button extra-service-button readwise-button" type="button"><span class="service-glyph">R</span><span data-i18n="readwise">Readwise Reader</span></button>
+    </div></div>
+                <div class="story-view-controls">
         <div class="story-tabs" role="tablist" aria-label="Feed preview sections">
           <button id="articlesTab" class="story-tab is-active" type="button" role="tab" aria-selected="true" data-i18n="articlesTab">Cards</button>
           <button id="feedInfoTab" class="story-tab" type="button" role="tab" aria-selected="false" data-i18n="feedInfoTab">List</button>
@@ -58,14 +66,7 @@
           </div>
         </label>
 
-          <div class="subscribe-inline"><span class="subscribe-inline-label" data-i18n="subscribeIn">Subscribe in</span><div class="dock-actions">
-      <button id="copyButton" class="action-button copy-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="10" height="11" rx="2"/><path d="M13 4H5a2 2 0 0 0-2 2v9"/></svg><span data-i18n="copyFeedUrl">Copy feed URL</span></button>
-      <button id="inoreaderButton" class="action-button inoreader-button" type="button"><span class="service-letter">I</span><span data-i18n="inoreader">Inoreader</span><svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M8 3h5v5M13 3 7 9"/></svg></button>
-      <button id="feedlyButton" class="action-button feedly-button" type="button"><span class="feedly-mark" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="feedly">Feedly</span><svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M8 3h5v5M13 3 7 9"/></svg></button>
-      <button id="newsblurButton" class="action-button extra-service-button newsblur-button" type="button"><span class="service-glyph">N</span><span data-i18n="newsblur">NewsBlur</span></button>
-      <button id="oldReaderButton" class="action-button extra-service-button oldreader-button" type="button"><span class="service-glyph">O</span><span data-i18n="oldReader">The Old Reader</span></button>
-      <button id="readwiseButton" class="action-button extra-service-button readwise-button" type="button"><span class="service-glyph">R</span><span data-i18n="readwise">Readwise Reader</span></button>
-    </div></div>        </div>
+        </div>
         <div class="stories-content-layout">
           <aside class="subscribe-sidebar" aria-label="Feed appearance and subscriptions">
       <div class="reader-controls" role="group" data-i18n-aria="readingControls" aria-label="Reading controls">
