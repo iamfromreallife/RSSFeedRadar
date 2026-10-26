@@ -34,6 +34,14 @@ let readerSettings;
 
 const $ = (selector) => document.querySelector(selector);
 const feedTitleEl = $('#feedTitle');
+const rawFeedTitleBar = $('#rawFeedTitleBar');
+const rawFeedTitleLink = $('#rawFeedTitleLink');
+function updateRawFeedTitle(title) {
+  if (!rawFeedTitleBar || !rawFeedTitleLink || !feedUrl) return;
+  rawFeedTitleLink.href = feedUrl;
+  rawFeedTitleLink.textContent = String(title || initialTitle || hostname(feedUrl) || 'RSS feed').trim();
+  rawFeedTitleBar.hidden = false;
+}
 const feedDescriptionEl = $('#feedDescription');
 const feedUrlEl = $('#feedUrl');
 const storiesGrid = $('#storiesGrid');
@@ -208,6 +216,7 @@ function applyTranslations() {
   document.title = `${lastFeedData?.title || initialTitle || translate('feedFallback')} — RSS Feed Radar`;
   if (lastFeedData) {
     feedTitleEl.textContent = lastFeedData.title || initialTitle || hostname(feedUrl) || translate('feedFallback');
+    updateRawFeedTitle(feedTitleEl.textContent);
     feedDescriptionEl.textContent = lastFeedData.description || `${hostname(lastFeedData.homeUrl || feedUrl)} · ${lastFeedData.items.length === 1 ? translate('countOne') : translate('countMany', { count: lastFeedData.items.length })}`;
     storyCountEl.textContent = String(lastFeedData.items.length);
     if (storiesSubtitle) storiesSubtitle.textContent = lastFeedData.items.length === 1 ? translate('countOne') : translate('countMany', { count: lastFeedData.items.length });
@@ -481,6 +490,7 @@ async function fetchFeed() {
   $('#footerHost').textContent = hostname(feedUrl);
   $('#footerHost').title = hostname(feedUrl);
   feedTitleEl.textContent = initialTitle || hostname(feedUrl) || translate('feedFallback');
+  updateRawFeedTitle(feedTitleEl.textContent);
   feedDescriptionEl.textContent = translate('loadingFeed');
 
   // YouTube's subscriptions route is an authenticated HTML page, not an RSS feed.
@@ -530,6 +540,7 @@ async function fetchFeed() {
     const data = extractFeed(text, response.url || feedUrl);
     lastFeedData = data;
     if (data.title) feedTitleEl.textContent = data.title;
+    updateRawFeedTitle(data.title || feedTitleEl.textContent);
     document.title = `${data.title || initialTitle || translate('feedFallback')} — RSS Feed Radar Reader`;
     if (data.description) feedDescriptionEl.textContent = data.description;
     else feedDescriptionEl.textContent = `${hostname(data.homeUrl || feedUrl)} · ${translate('countMany', {count: data.items.length})}`;
