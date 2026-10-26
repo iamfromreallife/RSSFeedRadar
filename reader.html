@@ -30,16 +30,7 @@
     </header>
 
     <main id="top">
-      <section class="hero-panel" aria-labelledby="feedTitle">
-        <div class="hero-decor decor-a"></div><div class="hero-decor decor-b"></div><div class="hero-grid"></div>
-        <div class="hero-content">
-          <div class="eyebrow"><span class="eyebrow-mark">↗</span><span data-i18n="readingFrom">YOU’RE READING FROM</span></div>
-          <h1 id="feedTitle">Loading feed…</h1>
-          <p id="feedDescription" class="feed-description" data-i18n="loadingFeed">Fetching the latest stories from this feed.</p>
-          <div class="hero-meta"><span class="host-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.2"/><path d="M2.8 10h14.4M10 2.8c2 2 3 4.4 3 7.2s-1 5.2-3 7.2c-2-2-3-4.4-3-7.2s1-5.2 3-7.2Z"/></svg></span><a id="feedUrl" href="#" target="_blank" rel="noopener noreferrer"> </a><button id="copyInlineButton" class="copy-inline" type="button" data-i18n-aria="copyFeedUrl" data-i18n-title="copyFeedUrl" aria-label="Copy feed URL" title="Copy feed URL"><svg viewBox="0 0 20 20"><rect x="7" y="7" width="10" height="11" rx="2"/><path d="M13 4H5a2 2 0 0 0-2 2v9"/></svg></button></div>
-        </div>
-        <div class="hero-art" aria-hidden="true"><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-core"><svg viewBox="0 0 100 100" fill="none"><circle cx="24" cy="76" r="7" fill="currentColor"/><path d="M23 49c17 0 31 14 31 31M23 26c30 0 54 24 54 54" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><path d="m66 20 4-8 4 8 8 4-8 4-4 8-4-8-8-4 8-4Z" fill="#C4F4DC"/></svg></div><div class="art-mini-card mini-one"><span></span><i></i><i></i><i></i></div><div class="art-mini-card mini-two"><span></span><i></i><i></i></div></div>
-      </section>
+      <div class="feed-metadata" hidden aria-hidden="true"><h1 id="feedTitle">Loading feed…</h1><p id="feedDescription" data-i18n="loadingFeed">Fetching the latest stories from this feed.</p><a id="feedUrl" href="#" target="_blank" rel="noopener noreferrer"> </a><button id="copyInlineButton" type="button" aria-label="Copy feed URL" title="Copy feed URL"></button></div>
 
       <div class="reader-controls" role="group" data-i18n-aria="readingControls" aria-label="Reading controls">
         <div class="control-unit font-family-control" role="group" data-i18n-aria="fontFamily" aria-label="Font family">
@@ -117,6 +108,16 @@
           <button id="articlesTab" class="story-tab is-active" type="button" role="tab" aria-selected="true" data-i18n="articlesTab">Cards</button>
           <button id="feedInfoTab" class="story-tab" type="button" role="tab" aria-selected="false" data-i18n="feedInfoTab">List</button>
         </div>
+        <div class="stories-content-layout">
+          <aside class="subscribe-sidebar" aria-label="Subscribe to this feed"><div class="dock-actions">
+      <button id="copyButton" class="action-button copy-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="10" height="11" rx="2"/><path d="M13 4H5a2 2 0 0 0-2 2v9"/></svg><span data-i18n="copyFeedUrl">Copy feed URL</span></button>
+      <button id="inoreaderButton" class="action-button inoreader-button" type="button"><span class="service-letter">I</span><span data-i18n="inoreader">Inoreader</span><svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M8 3h5v5M13 3 7 9"/></svg></button>
+      <button id="feedlyButton" class="action-button feedly-button" type="button"><span class="feedly-mark" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="feedly">Feedly</span><svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M8 3h5v5M13 3 7 9"/></svg></button>
+      <button id="newsblurButton" class="action-button extra-service-button newsblur-button" type="button"><span class="service-glyph">N</span><span data-i18n="newsblur">NewsBlur</span></button>
+      <button id="oldReaderButton" class="action-button extra-service-button oldreader-button" type="button"><span class="service-glyph">O</span><span data-i18n="oldReader">The Old Reader</span></button>
+      <button id="readwiseButton" class="action-button extra-service-button readwise-button" type="button"><span class="service-glyph">R</span><span data-i18n="readwise">Readwise Reader</span></button>
+    </div></aside>
+          <div class="stories-content">
         <section id="feedInfoPanel" class="feed-info-panel" role="tabpanel" hidden>
           <h3 id="feedInfoTitle">Feed details</h3><p id="feedInfoDescription"></p><div id="feedInfoArticles" class="feed-info-articles" aria-label="Feed articles"></div>
         </section>
@@ -127,22 +128,15 @@
         <div id="storiesGrid" class="stories-grid" aria-live="polite"></div>
         <div id="sourceNote" class="source-note" hidden><span class="source-note-mark">✓</span><span data-i18n="sourceNote">Select a story to read its feed text in a preview window.</span></div>
         </div>
+
+          </div>
+        </div>
       </section>
     </main>
 
     <footer class="reader-footer"><span class="footer-brand">RSS FEED RADAR</span><span data-i18n="footerNote">Follow what matters. Skip the noise.</span><span class="footer-feed-host" id="footerHost"></span><div class="language-control" id="readerLanguageWrap"><span class="language-globe" aria-hidden="true"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.2"/><path d="M2.8 10h14.4M10 2.8c2 2 3 4.4 3 7.2s-1 5.2-3 7.2c-2-2-3-4.4-3-7.2s1-5.2 3-7.2Z"/></svg></span><span class="sr-only" data-i18n="language">Language</span><button class="language-trigger" id="readerLanguageButton" type="button" data-i18n-aria="language" aria-label="Language" aria-haspopup="menu" aria-expanded="false"><span id="readerLanguageCurrent">English</span><svg class="language-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button><div class="language-menu" id="readerLanguageMenu" role="menu" aria-label="Choose language" hidden><button type="button" class="language-option" data-language-option="en" role="menuitemradio" aria-checked="true">English</button><button type="button" class="language-option" data-language-option="pt" role="menuitemradio" aria-checked="false">Português</button><button type="button" class="language-option" data-language-option="es" role="menuitemradio" aria-checked="false">Español</button><button type="button" class="language-option" data-language-option="it" role="menuitemradio" aria-checked="false">Italiano</button><button type="button" class="language-option" data-language-option="fr" role="menuitemradio" aria-checked="false">Français</button><button type="button" class="language-option" data-language-option="de" role="menuitemradio" aria-checked="false">Deutsch</button></div><select id="readerLanguageSelect" class="language-native-select" data-i18n-aria="language" aria-label="Language" tabindex="-1" aria-hidden="true"><option value="en">English</option><option value="pt">Português</option><option value="es">Español</option><option value="it">Italiano</option><option value="fr">Français</option><option value="de">Deutsch</option></select></div></footer>
   </div>
 
-  <div class="action-dock" role="region" data-i18n-aria="feedActions" aria-label="Feed actions">
-    <div class="dock-inner"><div class="dock-copy"><span class="dock-overline" data-i18n="readyToFollow">READY TO FOLLOW?</span><strong id="dockTitle" data-i18n="subscribePrompt">Subscribe using the buttons below.</strong></div><div class="dock-actions">
-      <button id="copyButton" class="action-button copy-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="10" height="11" rx="2"/><path d="M13 4H5a2 2 0 0 0-2 2v9"/></svg><span data-i18n="copyFeedUrl">Copy feed URL</span></button>
-      <button id="inoreaderButton" class="action-button inoreader-button" type="button"><span class="service-letter">I</span><span data-i18n="inoreader">Inoreader</span><svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M8 3h5v5M13 3 7 9"/></svg></button>
-      <button id="feedlyButton" class="action-button feedly-button" type="button"><span class="feedly-mark" aria-hidden="true"><i></i><i></i><i></i></span><span data-i18n="feedly">Feedly</span><svg class="external-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3v10h10v-3M8 3h5v5M13 3 7 9"/></svg></button>
-      <button id="newsblurButton" class="action-button extra-service-button newsblur-button" type="button"><span class="service-glyph">N</span><span data-i18n="newsblur">NewsBlur</span></button>
-      <button id="oldReaderButton" class="action-button extra-service-button oldreader-button" type="button"><span class="service-glyph">O</span><span data-i18n="oldReader">The Old Reader</span></button>
-      <button id="readwiseButton" class="action-button extra-service-button readwise-button" type="button"><span class="service-glyph">R</span><span data-i18n="readwise">Readwise Reader</span></button>
-    </div></div>
-  </div>
   <div id="articleModal" class="article-modal" hidden role="dialog" aria-modal="true" aria-labelledby="modalArticleTitle">
     <div class="article-modal-backdrop" data-close-modal="true"></div>
     <section class="article-modal-card"><header class="article-modal-header"><span class="modal-kicker" data-i18n="articlePreview">ARTICLE PREVIEW</span><button id="closeArticleModal" class="modal-close" type="button" data-i18n-aria="close" aria-label="Close">×</button></header><h2 id="modalArticleTitle"><a id="modalArticleLink" href="#" target="_blank" rel="noopener noreferrer"></a></h2><div id="modalArticleMeta" class="modal-article-meta"></div><div id="modalArticleBody" class="modal-article-body"></div><footer class="modal-footer"><span data-i18n="articleLinkHint">Select the title to open the original article in a new tab.</span><a id="modalOpenArticle" class="modal-open-link" href="#" target="_blank" rel="noopener noreferrer" data-i18n="openOriginal">Open original article ↗</a></footer></section>
