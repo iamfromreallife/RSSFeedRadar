@@ -297,3 +297,32 @@ body.dark-mode .default-switch input:checked+.default-switch-track{border-color:
 @media(max-width:850px){.nav-bar{height:auto;min-height:86px;gap:12px;padding:15px 0}.nav-actions{gap:10px}.default-previewer-control{max-width:225px;gap:7px}}
 @media(max-width:620px){.nav-bar{align-items:flex-start}.nav-brand-group{width:100%;flex:1 1 100%}.nav-actions{width:100%;flex:1 1 100%;justify-content:space-between}.default-previewer-control{max-width:calc(100% - 118px);justify-content:flex-start}.default-previewer-label{max-width:190px}}
 @media(max-width:380px){.nav-actions{align-items:flex-start;flex-wrap:wrap}.default-previewer-control{max-width:100%;flex:1 1 100%;justify-content:space-between}.nav-actions .donation-button{align-self:flex-end}}
+
+
+/* Layout refresh: remove the feed hero and place subscribe actions beside stories. */
+.hero-panel { display:none !important; }
+.feed-metadata[hidden] { display:none !important; }
+body { padding-bottom:0 !important; }
+.action-dock { position:static; inset:auto; padding:0; margin:0; background:transparent; border:0; box-shadow:none; backdrop-filter:none; }
+.dock-inner { display:block; max-width:none; margin:0; }
+.dock-copy { display:none !important; }
+.dock-actions { display:flex; flex-direction:column; align-items:stretch; gap:9px; }
+.stories-section { padding-top:22px; }
+.stories-content-layout { display:grid; grid-template-columns:190px minmax(0,1fr); align-items:start; gap:24px; }
+.subscribe-sidebar { position:sticky; top:18px; min-width:0; padding-top:4px; }
+.subscribe-sidebar .action-button { width:100%; min-height:44px; height:auto; white-space:normal; line-height:1.25; justify-content:flex-start; text-align:left; }
+.stories-content { min-width:0; }
+.stories-content .stories-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.stories-content .feed-info-panel { margin-bottom:0; }
+@media(max-width:900px) {
+  .stories-content-layout { grid-template-columns:160px minmax(0,1fr); gap:16px; }
+  .stories-content .stories-grid { grid-template-columns:minmax(0,1fr); }
+}
+@media(max-width:620px) {
+  .stories-content-layout { grid-template-columns:minmax(0,1fr); gap:18px; }
+  .subscribe-sidebar { position:static; padding:0; }
+  .subscribe-sidebar .dock-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .subscribe-sidebar .action-button { justify-content:center; text-align:center; padding:9px 8px; font-size:11px; }
+  .stories-content .stories-grid { grid-template-columns:minmax(0,1fr); }
+  .stories-section { padding-top:18px; }
+}
