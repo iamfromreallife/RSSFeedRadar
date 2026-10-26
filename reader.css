@@ -856,3 +856,12 @@ body.dark-mode .font-select-control .font-select-option:focus-visible { outline-
   .subscribe-inline { flex-wrap:wrap; gap:8px; }
   .subscribe-inline .subscribe-inline-label { white-space:normal; }
 }
+
+
+.raw-feed-title-bar{max-width:1120px;margin:-7px auto 0;padding:0 0 13px;min-width:0}
+.raw-feed-title-bar[hidden]{display:none}
+.raw-feed-title-bar a{display:inline-block;max-width:100%;overflow-wrap:anywhere;color:#111!important;font-size:15px;font-weight:750;line-height:1.35;text-decoration:none}
+.raw-feed-title-bar a:hover{text-decoration:underline;text-underline-offset:3px}
+body.dark-mode .raw-feed-title-bar a{color:#111!important}
+@media(max-width:900px){.raw-feed-title-bar{width:calc(100% - 36px)}}
+@media(max-width:620px){.raw-feed-title-bar{width:calc(100% - 28px);margin:-2px auto 0;padding-bottom:10px}.raw-feed-title-bar a{font-size:14px}}
