@@ -877,3 +877,21 @@ body.dark-mode .raw-feed-title-bar a{color:#111!important}
  .raw-feed-title-bar{margin-bottom:7px;padding:0}
  .raw-feed-title-bar a{font-size:19px;letter-spacing:-.065em}
 }
+
+/* Compact the preview header stack: brand, feed title, count and subscriptions. */
+.nav-bar{height:70px!important}
+.raw-feed-title-bar{margin:0 0 3px!important;padding:0!important}
+.raw-feed-title-bar a{line-height:1.08!important}
+.stories-section{padding-top:0!important}
+.stories-section-header{margin-bottom:2px!important}
+.subscribe-inline{margin-top:0!important;margin-bottom:10px!important;gap:8px!important}
+@media(max-width:900px){
+ .nav-bar{height:64px!important}
+ .raw-feed-title-bar{margin-bottom:2px!important}
+ .subscribe-inline{margin-bottom:8px!important}
+}
+@media(max-width:620px){
+ .nav-bar{height:auto!important;min-height:62px!important}
+ .raw-feed-title-bar{margin-bottom:3px!important}
+ .subscribe-inline{margin-bottom:7px!important;gap:6px!important}
+}
