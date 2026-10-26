@@ -865,3 +865,15 @@ body.dark-mode .font-select-control .font-select-option:focus-visible { outline-
 body.dark-mode .raw-feed-title-bar a{color:#111!important}
 @media(max-width:900px){.raw-feed-title-bar{width:calc(100% - 36px)}}
 @media(max-width:620px){.raw-feed-title-bar{width:calc(100% - 28px);margin:-2px auto 0;padding-bottom:10px}.raw-feed-title-bar a{font-size:14px}}
+
+/* Keep the feed title directly above the article count, aligned to the page content. */
+.raw-feed-title-bar{width:100%;max-width:none;margin:0 0 8px;padding:0;min-width:0;text-align:left}
+.raw-feed-title-bar a{display:inline-block;max-width:100%;overflow-wrap:anywhere;color:#111!important;font-family:inherit;font-size:21px;font-weight:850;letter-spacing:-.065em;line-height:1.2;text-align:left;text-decoration:none}
+.raw-feed-title-bar a:hover{text-decoration:underline;text-underline-offset:3px}
+body.dark-mode .raw-feed-title-bar a{color:#111!important}
+.stories-section{padding-top:8px!important}
+.subscribe-inline{margin-top:0!important}
+@media(max-width:620px){
+ .raw-feed-title-bar{margin-bottom:7px;padding:0}
+ .raw-feed-title-bar a{font-size:19px;letter-spacing:-.065em}
+}
