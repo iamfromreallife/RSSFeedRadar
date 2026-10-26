@@ -758,21 +758,28 @@ function isSupportedFeedNavigation(details) {
   const explicitFeedMime = /^(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|rdf\+xml|feed\+json|jsonfeed)|text\/(?:rss|atom))$/.test(mime);
   if (explicitFeedMime) return true;
 
-  // Generic XML/JSON MIME types are only accepted when the URL itself looks
-  // feed-specific; this avoids intercepting sitemaps and generic API responses.
+  // Generic XML responses are common for RSS endpoints whose server does not
+  // send an RSS-specific MIME type. Accept .xml files as well as recognisable
+  // feed paths, while excluding sitemaps, oEmbed and unrelated XML resources.
+  const path = (() => {
+    try { return decodeURIComponent(url.pathname || '').toLowerCase(); }
+    catch (_) { return String(url.pathname || '').toLowerCase(); }
+  })();
   const pathHint = feedPathHint(url);
   const genericXml = /^(?:application\/xml|text\/xml|application\/x-xml)$/.test(mime);
   const genericJson = /^(?:application\/json|text\/json)$/.test(mime);
   const plainText = /^text\/plain$/.test(mime);
+  const genericXmlFile = /\.xml$/i.test(path)
+    && !/(?:^|\/)(?:sitemap(?:[-_][^/]*)?|crossdomain|clientaccesspolicy)\.xml$/i.test(path);
+  const genericJsonFile = /\.json$/i.test(path)
+    && !/(?:^|\/)(?:package|manifest|config)\.json$/i.test(path);
   const attachmentFeedName = /filename\*?=[^;]*\.(?:rss|atom|rdf)(?:\.xml)?(?:["';]|$)/i.test(disposition)
     || /filename\*?=[^;]*(?:feed|rss|atom)[^;]*\.xml(?:["';]|$)/i.test(disposition);
-  return attachmentFeedName || (pathHint && (
-    genericXml
-    || genericJson
-    || plainText
-    || /\.(?:rss|atom|rdf)(?:\.xml)?$/i.test(url.pathname)
-    || /(?:application\/octet-stream)/i.test(mime)
-  ));
+  return attachmentFeedName
+    || (genericXml && (pathHint || genericXmlFile))
+    || (genericJson && (pathHint || genericJsonFile))
+    || (plainText && pathHint)
+    || (pathHint && /(?:application\/octet-stream)/i.test(mime));
 }
 
 function feedPreviewTitle(rawUrl) {
