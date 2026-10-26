@@ -348,8 +348,9 @@ body { padding-bottom:0 !important; }
 .stories-grid .story-card:nth-child(1) .story-content { display:block; padding:17px; }
 .stories-grid .story-card:nth-child(1) .story-title { font-size:21px; -webkit-line-clamp:3; }
 @media(max-width:1280px) {
-  .subscribe-sidebar { left:calc(-150px - 16px); width:150px; }
-  .subscribe-sidebar .action-button { font-size:11px; padding:9px 8px; }
+  .subscribe-sidebar { position:static; width:auto; margin-bottom:16px; }
+  .subscribe-sidebar .dock-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .subscribe-sidebar .action-button { font-size:11px; padding:9px 8px; justify-content:center; text-align:center; }
 }
 @media(max-width:1000px) {
   .subscribe-sidebar { position:static; width:auto; margin-bottom:16px; }
