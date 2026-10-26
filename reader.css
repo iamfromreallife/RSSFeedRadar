@@ -665,3 +665,27 @@ body.dark-mode .columns-select-option.is-selected::after { color:#b4acff; }
 .columns-select-trigger { min-height:100%; font-size:12px; }
 body.dark-mode .card-columns-control { background:#202338; border-color:#383d55; color:#e6e8f7; box-shadow:none; }
 body.dark-mode .columns-select-control { background:#292d43; border-color:#444963; color:#e3e4ff; box-shadow:none; }
+
+
+/* Keep subscription actions above the view selector; put Cards/List directly above articles. */
+.subscribe-inline { order:0; flex:0 1 auto; width:100%; margin:0 0 10px; justify-content:flex-end; }
+.story-view-controls { order:1; display:flex; align-items:center; flex-wrap:wrap; width:100%; gap:10px; margin:0 0 16px; }
+.story-view-controls .story-tabs,
+.story-view-controls .card-columns-control { flex:0 0 auto; }
+.subscribe-inline .subscribe-inline-label { white-space:normal; max-width:100%; }
+.subscribe-inline .dock-actions { display:flex !important; flex-direction:row !important; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:7px; }
+.subscribe-inline .action-button { flex:0 1 auto !important; width:auto !important; min-width:0; max-width:100%; white-space:normal; overflow-wrap:anywhere; text-align:center; }
+.stories-content-layout { min-width:0; }
+.stories-content { min-width:0; }
+.stories-grid { min-width:0; }
+@media(max-width:1200px) {
+  .subscribe-inline { justify-content:flex-start; }
+  .subscribe-inline .dock-actions { justify-content:flex-start; }
+}
+@media(max-width:620px) {
+  .story-view-controls { gap:7px; }
+  .subscribe-inline { align-items:flex-start; }
+  .subscribe-inline .dock-actions { justify-content:flex-start; }
+  .subscribe-inline .action-button { flex:0 1 auto !important; }
+  .subscribe-inline-label { flex-basis:100%; }
+}
