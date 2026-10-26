@@ -37,6 +37,11 @@ function isOEmbedUrl(raw) {
   } catch (_) { return /(?:wp-json\/oembed|oembed\/1\.0\/embed)/i.test(String(raw || '')); }
 }
 
+function isInoreaderUrl(raw) {
+  try { return /(^|\\.)inoreader\\.com$/i.test(new URL(raw).hostname); }
+  catch (_) { return false; }
+}
+
 function isYouTubeNavigationFeedUrl(raw) {
   try {
     const url = new URL(raw);
@@ -411,22 +416,27 @@ async function processDiscovery(tabId, message) {
   const revision = (latestRevision.get(tabId) || 0) + 1;
   latestRevision.set(tabId, revision);
   const pageUrl = safeUrl(message.pageUrl) || '';
-  const direct = cleanFeeds(message.feeds, message.pageTitle || 'Website feed');
+  const inoreaderPage = isInoreaderUrl(pageUrl);
+  const direct = cleanFeeds(message.feeds, message.pageTitle || 'Website feed')
+    .filter((feed) => !inoreaderPage || isInoreaderUrl(feed.url));
   await storeFeeds(tabId, direct, pageUrl);
 
   const already = new Set(direct.map((feed) => feed.url));
   const pageCandidates = (Array.isArray(message.candidates) ? message.candidates : [])
     .slice(0, 12)
     .map((item) => ({ url: safeUrl(item?.url), title: String(item?.title || 'Website feed').slice(0, 160) }))
-    .filter((item) => item.url && !isOEmbedUrl(item.url) && !already.has(item.url));
+    .filter((item) => item.url && !isOEmbedUrl(item.url)
+      && (!inoreaderPage || isInoreaderUrl(item.url))
+      && !already.has(item.url));
 
   // Domain-wide discovery runs on every site except Reddit. Reddit's anonymous
   // RSS endpoint is aggressively rate-limited, so broad endpoint probing can
   // consume the request budget before the user opens the preview.
   const redditPage = isRedditUrl(pageUrl);
   const redditCandidates = pageCandidates.filter((item) => isRedditFeedUrl(item.url));
-  const candidatesToValidate = pageCandidates.filter((item) => !isRedditFeedUrl(item.url));
-  const domainFeedsPromise = redditPage ? Promise.resolve([]) : getDomainFeeds(pageUrl).catch(() => []);
+  const candidatesToValidate = pageCandidates.filter((item) => !isRedditFeedUrl(item.url)
+    && (!inoreaderPage || isInoreaderUrl(item.url)));
+  const domainFeedsPromise = (redditPage || inoreaderPage) ? Promise.resolve([]) : getDomainFeeds(pageUrl).catch(() => []);
   const pageFeedsPromise = validateCandidates(candidatesToValidate, 6);
   const [domainFeeds, verifiedPageFeeds] = await Promise.all([domainFeedsPromise, pageFeedsPromise]);
   if (latestRevision.get(tabId) !== revision) return { ok: true, stale: true };
