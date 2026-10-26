@@ -699,3 +699,12 @@ body.dark-mode .columns-select-control { background:#292d43; border-color:#44496
   .subscribe-inline { align-items:center; gap:8px; }
   .subscribe-inline .subscribe-inline-label { flex-basis:auto; }
 }
+
+
+/* Version 2.0: align Cards/List and Card columns to the right edge of the article area. */
+.story-view-controls { display:flex; align-items:center; justify-content:flex-end; width:100%; margin-left:auto; }
+.story-view-controls .story-tabs,
+.story-view-controls .card-columns-control { flex:0 0 auto; }
+@media(max-width:620px) {
+  .story-view-controls { justify-content:flex-end; }
+}
