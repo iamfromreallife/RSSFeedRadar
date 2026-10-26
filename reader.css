@@ -845,3 +845,14 @@ body.dark-mode .font-select-control .font-select-option:focus-visible { outline-
   .subscribe-inline { flex-wrap:wrap; }
   .subscribe-inline .story-count-inline { margin-right:2px; }
 }
+
+
+/* Restore the translated Subscribe prompt and keep the article count left-aligned. */
+.subscribe-inline .subscribe-inline-label { display:inline-flex !important; flex:0 0 auto; align-items:center; align-self:center; margin:0; padding:0; line-height:1.2; white-space:nowrap; text-align:left; }
+.subscribe-inline .story-count-inline { margin:0 auto 0 0 !important; flex:0 0 auto; text-align:left; justify-content:flex-start; }
+.subscribe-inline { display:flex !important; align-items:center; justify-content:flex-start; gap:12px; }
+.subscribe-inline .dock-actions { display:flex !important; flex:0 1 auto; justify-content:flex-start; gap:6px; min-width:0; }
+@media(max-width:900px) {
+  .subscribe-inline { flex-wrap:wrap; gap:8px; }
+  .subscribe-inline .subscribe-inline-label { white-space:normal; }
+}
