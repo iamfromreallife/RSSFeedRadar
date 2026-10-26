@@ -624,3 +624,35 @@ body.dark-mode .card-columns-control select option {
   .subscribe-inline .dock-actions { display:flex !important; flex-direction:row !important; flex-wrap:wrap; justify-content:flex-start; }
   .subscribe-inline .action-button { min-width:0; flex:1 1 130px !important; white-space:normal; }
 }
+
+
+/* Match the language selector's custom popup styling for card columns. */
+.columns-select-control { position:relative; display:inline-flex; align-items:center; min-width:62px; height:38px; padding:0 10px; border:1px solid #dfe2f0; border-radius:12px; background:linear-gradient(135deg,#fff,#f8f8ff); color:#4d45bf; box-shadow:0 5px 16px rgba(40,44,90,.05); }
+.columns-select-trigger { display:inline-flex; align-items:center; justify-content:space-between; gap:10px; width:100%; min-width:0; height:100%; padding:0; border:0; background:transparent; color:inherit; font:inherit; font-size:12px; font-weight:800; cursor:pointer; }
+.columns-select-chevron { width:14px; height:14px; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.columns-select-menu { position:absolute; z-index:110; top:calc(100% + 8px); right:0; display:flex; flex-direction:column; gap:3px; min-width:100%; width:76px; padding:6px; border:1px solid #e1e3f0; border-radius:15px; background:rgba(255,255,255,.98); box-shadow:0 16px 36px rgba(30,32,70,.17); backdrop-filter:blur(16px); animation:languageMenuIn .14s ease both; }
+.columns-select-menu[hidden] { display:none !important; }
+.columns-select-option { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; min-height:35px; padding:8px 10px; border:0; border-radius:9px; background:transparent; color:#444964; font-family:inherit; font-size:12px; font-weight:650; line-height:1.2; cursor:pointer; }
+.columns-select-option:hover { background:#f3f2ff; color:#5145d1; }
+.columns-select-option.is-selected { background:linear-gradient(110deg,#f0efff,#faf9ff); color:#4f45cc; font-weight:800; }
+.columns-select-option.is-selected::after { content:"✓"; color:#6256e8; font-size:12px; font-weight:900; }
+#cardColumnsSelect { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; opacity:0!important; pointer-events:none!important; }
+body.dark-mode .columns-select-control { background:linear-gradient(135deg,#24263b,#1c202e); border-color:#363a50; color:#f0f1ff; box-shadow:none; }
+body.dark-mode .columns-select-menu { background:rgba(29,32,46,.99); border-color:#363a50; box-shadow:0 16px 36px rgba(0,0,0,.38); }
+body.dark-mode .columns-select-option { color:#e6e8f7; }
+body.dark-mode .columns-select-option:hover { background:#292d43; color:#d6d1ff; }
+body.dark-mode .columns-select-option.is-selected { background:#302d4b; color:#d6d1ff; }
+body.dark-mode .columns-select-option.is-selected::after { color:#b4acff; }
+
+/* Keep the subscription services in a horizontal row instead of inheriting sidebar sizing. */
+.subscribe-inline { flex:1 1 100%; width:100%; min-width:0; margin-left:0; justify-content:flex-end; }
+.subscribe-inline .dock-actions { display:flex !important; flex-direction:row !important; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:7px; width:auto; min-width:0; }
+.subscribe-inline .action-button { flex:0 1 auto !important; width:auto !important; min-width:max-content; max-width:100%; height:auto !important; min-height:38px; white-space:nowrap; overflow-wrap:normal; }
+@media(max-width:800px) {
+  .subscribe-inline .dock-actions { justify-content:flex-start; }
+  .subscribe-inline .action-button { min-width:0; white-space:normal; }
+}
+@media(max-width:520px) {
+  .subscribe-inline .dock-actions { display:flex !important; flex-direction:row !important; flex-wrap:wrap; }
+  .subscribe-inline .action-button { flex:0 1 auto !important; width:auto !important; min-width:0; }
+}
