@@ -321,13 +321,13 @@ function articleTextWithParagraphs(value) {
   const blocks = Array.from(doc.body.querySelectorAll(blockSelector)).filter(node => !node.querySelector(blockSelector));
   let paragraphs = blocks.map(node => normalizeText(node.textContent)).filter(Boolean);
   if (!paragraphs.length) {
-    const text = (doc.body.textContent || '').replace(/\\u00a0/g, ' ').trim();
-    paragraphs = text.split(/\\n[ \\t]*\\n+/).map(normalizeText).filter(Boolean);
+    const text = (doc.body.textContent || '').replace(/\u00a0/g, ' ').trim();
+    paragraphs = text.split(/\n[ \t]*\n+/).map(normalizeText).filter(Boolean);
   }
   if (!paragraphs.length) {
-    paragraphs = raw.replace(/<br\\s*\\/?\\s*>/gi, '\\n').replace(/<\\/p\\s*>/gi, '\\n\\n').replace(/<[^>]*>/g, ' ').split(/\\n+/).map(normalizeText).filter(Boolean);
+    paragraphs = raw.replace(/<br\s*\/?\s*>/gi, '\n').replace(/<\/p\s*>/gi, '\n\n').replace(/<[^>]*>/g, ' ').split(/\n+/).map(normalizeText).filter(Boolean);
   }
-  return paragraphs.join('\\n\\n') || normalizeText(raw);
+  return paragraphs.join('\n\n') || normalizeText(raw);
 }
 function firstImageFromHtml(value, base) {
   if (!value) return '';
