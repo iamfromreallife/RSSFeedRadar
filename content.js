@@ -160,6 +160,12 @@
       }
     }
 
+    // The Conversation exposes its main editorial feed at a non-standard Atom URL.
+    // Regional pages (for example /europe) do not consistently declare this in HTML.
+    if (host === 'theconversation.com' || host.endsWith('.theconversation.com')) {
+      add('https://theconversation.com/global/home-page.atom', 'The Conversation feed');
+    }
+
     // dev.to author feeds.
     if (host === 'dev.to' && path.startsWith('/@')) {
       add(`${origin}/feed/${path.slice(2)}`, 'DEV Community author feed');
