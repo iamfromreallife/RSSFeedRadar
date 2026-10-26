@@ -45,9 +45,17 @@
         </div>
         <label id="cardColumnsControl" class="card-columns-control">
           <span data-i18n="cardColumns">Card columns</span>
-          <select id="cardColumnsSelect" data-i18n-aria="cardColumns" aria-label="Card columns">
-            <option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
-          </select>
+          <div class="columns-select-control" id="cardColumnsWrap">
+            <button class="columns-select-trigger" id="cardColumnsButton" type="button" data-i18n-aria="cardColumns" aria-label="Card columns" aria-haspopup="menu" aria-expanded="false"><span id="cardColumnsCurrent">2</span><svg class="columns-select-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></button>
+            <div class="columns-select-menu" id="cardColumnsMenu" role="menu" aria-label="Choose card columns" hidden>
+              <button type="button" class="columns-select-option" data-columns-option="1" role="menuitemradio" aria-checked="false">1</button>
+              <button type="button" class="columns-select-option" data-columns-option="2" role="menuitemradio" aria-checked="true">2</button>
+              <button type="button" class="columns-select-option" data-columns-option="3" role="menuitemradio" aria-checked="false">3</button>
+              <button type="button" class="columns-select-option" data-columns-option="4" role="menuitemradio" aria-checked="false">4</button>
+              <button type="button" class="columns-select-option" data-columns-option="5" role="menuitemradio" aria-checked="false">5</button>
+            </div>
+            <select id="cardColumnsSelect" data-i18n-aria="cardColumns" aria-label="Card columns" tabindex="-1" aria-hidden="true"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+          </div>
         </label>
 
           <div class="subscribe-inline"><span class="subscribe-inline-label" data-i18n="subscribeIn">Subscribe in</span><div class="dock-actions">
