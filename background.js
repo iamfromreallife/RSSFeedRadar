@@ -864,17 +864,28 @@ if (chrome.webNavigation?.onCommitted) {
     previewFallbackByTab.set(details.tabId, details.url);
 
     chrome.storage.local.get(DEFAULT_PREVIEWER_STORAGE_KEY).then(async (stored) => {
-      if (stored[DEFAULT_PREVIEWER_STORAGE_KEY] !== true) return;
+      if (stored[DEFAULT_PREVIEWER_STORAGE_KEY] !== true) {
+        previewFallbackByTab.delete(details.tabId);
+        return;
+      }
       let tab;
-      try { tab = await chrome.tabs.get(details.tabId); } catch (_) { return; }
+      try { tab = await chrome.tabs.get(details.tabId); }
+      catch (_) { previewFallbackByTab.delete(details.tabId); return; }
       // Do not redirect if the user has already navigated away while storage was read.
-      if (!tab?.url || tab.url !== details.url) return;
+      if (!tab?.url || tab.url !== details.url) {
+        previewFallbackByTab.delete(details.tabId);
+        return;
+      }
       const feedUrl = safeUrl(details.url);
-      if (!feedUrl) return;
+      if (!feedUrl) {
+        previewFallbackByTab.delete(details.tabId);
+        return;
+      }
       const params = new URLSearchParams({ url: feedUrl, title: feedPreviewTitle(feedUrl) });
       const readerUrl = chrome.runtime.getURL('reader.html?' + params.toString());
       try { await chrome.tabs.update(details.tabId, { url: readerUrl }); }
-      catch (_) { previewFallbackByTab.delete(details.tabId); }
-    }).catch(() => {});
+      catch (_) {}
+      finally { previewFallbackByTab.delete(details.tabId); }
+    }).catch(() => { previewFallbackByTab.delete(details.tabId); });
   });
 }
