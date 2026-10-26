@@ -482,3 +482,34 @@ body.dark-mode .reader-controls .mode-toggle { background:var(--control-surface,
   .subscribe-sidebar .dock-actions { grid-template-columns:minmax(0,1fr); }
   .stories-content .stories-grid { grid-template-columns:minmax(0,1fr) !important; }
 }
+
+
+/* Subscription services share the view-control row, aligned to its right edge. */
+.story-view-controls { display:flex; align-items:center; flex-wrap:wrap; width:100%; gap:10px; }
+.story-tabs { flex:0 0 auto; }
+.card-columns-control { flex:0 0 auto; }
+.subscribe-inline { margin-left:auto; display:flex; align-items:center; justify-content:flex-end; flex:1 1 480px; min-width:0; gap:10px; }
+.subscribe-inline-label { flex:0 0 auto; color:var(--muted-text, #626781); font-size:12px; font-weight:800; white-space:nowrap; }
+.subscribe-inline .dock-actions { display:flex; flex:1 1 auto; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:7px; min-width:0; }
+.subscribe-inline .action-button { display:inline-flex; flex:0 1 auto; width:auto; min-width:0; min-height:40px; height:auto; align-items:center; justify-content:center; gap:7px; padding:9px 11px; border-radius:12px; white-space:normal; overflow-wrap:anywhere; text-align:center; line-height:1.2; font-size:11px; }
+.subscribe-inline .action-button svg { flex:0 0 auto; }
+.subscribe-inline .service-letter, .subscribe-inline .service-glyph { flex:0 0 auto; }
+.card-columns-control select { appearance:none; -webkit-appearance:none; min-width:54px; padding:8px 30px 8px 12px; border:1px solid #e0e2f0; border-radius:11px; background-color:#fff; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%235b55c8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 9px center; color:#4d45bf; font:inherit; font-weight:800; box-shadow:0 2px 5px rgba(48,49,90,.05); cursor:pointer; }
+.card-columns-control select:focus-visible { outline:2px solid #8e83ff; outline-offset:2px; }
+body.dark-mode .card-columns-control select { color:#e3e4ff; background-color:#24263b; border-color:#444761; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23c6c0ff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+@media(max-width:1380px) {
+  .subscribe-inline { flex-basis:100%; margin-left:0; justify-content:flex-start; }
+  .subscribe-inline .dock-actions { justify-content:flex-start; }
+}
+@media(max-width:800px) {
+  .story-view-controls { align-items:flex-start; }
+  .subscribe-inline { flex-wrap:wrap; gap:7px; }
+  .subscribe-inline .dock-actions { justify-content:flex-start; }
+  .subscribe-inline .action-button { flex:1 1 auto; }
+}
+@media(max-width:520px) {
+  .subscribe-inline { display:block; }
+  .subscribe-inline-label { display:block; margin-bottom:7px; }
+  .subscribe-inline .dock-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .subscribe-inline .action-button { width:100%; min-width:0; padding:9px 7px; font-size:10px; }
+}
