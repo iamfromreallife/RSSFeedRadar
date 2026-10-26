@@ -744,7 +744,12 @@ function feedPathHint(url) {
   const hasFeedQuery = ['feed', 'format', 'output', 'type'].some((key) =>
     /^(?:rss2?|atom|json|jsonfeed)$/i.test(params.get(key) || '')
   );
-  return isKnownFeedHost(url)
+  // Google News exposes RSS endpoints under /rss/ with the query carrying
+  // the search; these URLs usually have no .xml suffix or explicit format.
+  const googleNewsRssPath = /(?:^|\/)rss(?:\/|$)/i.test(path)
+    && /(?:^|\.)news\.google\.com$/i.test(url.hostname.toLowerCase());
+  return googleNewsRssPath
+    || isKnownFeedHost(url)
     || hasFeedQuery
     || /\.(?:rss|atom|rdf)(?:\.xml)?$/i.test(path)
     || /(?:^|\/)feeds?(?:\/|$)/i.test(path)
