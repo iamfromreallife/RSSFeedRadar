@@ -838,6 +838,61 @@ function feedPreviewTitle(rawUrl) {
     return clean ? clean + ' — ' + url.hostname.replace(/^www\./i, '') : url.hostname.replace(/^www\./i, '') + ' RSS feed';
   } catch (_) { return 'RSS feed'; }
 }
+async function isRawXmlFeed(rawUrl) {
+  const url = safeUrl(rawUrl);
+  if (!url || isOEmbedUrl(url) || isYouTubeNavigationFeedUrl(url)) return false;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow',
+      credentials: 'omit',
+      cache: 'no-store',
+      signal: controller.signal,
+      headers: { Accept: 'application/rss+xml, application/atom+xml, application/rdf+xml, application/xml, text/xml;q=0.9, */*;q=0.1' }
+    });
+    if (!response.ok) return false;
+    const mime = String(response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+    // Only raw XML documents qualify. In particular, a URL ending in /rss that
+    // returns an HTML webpage must remain a normal webpage.
+    if (!/^(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|rdf\+xml|xml|x-xml)|text\/(?:xml|rss|atom))$/.test(mime)) return false;
+    const reader = response.body?.getReader?.();
+    if (!reader) {
+      const text = (await response.text()).slice(0, 65536).replace(/^\uFEFF/, '').trimStart();
+      return isRssXmlDocument(text);
+    }
+    const decoder = new TextDecoder();
+    let sample = '';
+    try {
+      while (sample.length < 65536) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        sample += decoder.decode(value, { stream: true });
+      }
+    } finally {
+      try { await reader.cancel(); } catch (_) {}
+    }
+    return isRssXmlDocument(sample.replace(/^\uFEFF/, '').trimStart());
+  } catch (_) {
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function isRssXmlDocument(text) {
+  const sample = String(text || '').replace(/^\uFEFF/, '').trimStart();
+  // Ignore an optional XML declaration and comments, then require an RSS, Atom,
+  // or RDF root element. A generic XML file or HTML page is not a feed preview.
+  const withoutPreamble = sample
+    .replace(/^(?:<\?xml[^>]*\?>\s*)+/i, '')
+    .replace(/^(?:<!--[\s\S]*?-->\s*)+/i, '')
+    .trimStart();
+  return /^<(?:rss|feed|rdf:RDF|RDF)(?:\s|>)/i.test(withoutPreamble)
+    && !/^<(?:html|!doctype\s+html)(?:\s|>)/i.test(withoutPreamble);
+}
+
 
 chrome.webRequest.onBeforeRequest.addListener((details) => {
   if (details.type !== 'main_frame' || details.tabId < 0) return;
@@ -869,6 +924,7 @@ chrome.webRequest.onHeadersReceived.addListener((details) => {
 
     const feedUrl = safeUrl(details.url);
     if (!feedUrl || isOEmbedUrl(feedUrl) || isYouTubeNavigationFeedUrl(feedUrl)) return;
+    if (!await isRawXmlFeed(feedUrl)) return;
     handledFeedRequestIds.set(details.requestId, Date.now());
 
     const params = new URLSearchParams({ url: feedUrl, title: feedPreviewTitle(feedUrl) });
@@ -925,7 +981,7 @@ if (chrome.webNavigation?.onCommitted) {
         return;
       }
       const feedUrl = safeUrl(details.url);
-      if (!feedUrl) {
+      if (!feedUrl || !await isRawXmlFeed(feedUrl)) {
         previewFallbackByTab.delete(details.tabId);
         return;
       }
