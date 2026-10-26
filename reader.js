@@ -309,6 +309,37 @@ function htmlToText(value) {
   doc.querySelectorAll('script,style,noscript,svg,iframe,form').forEach(node => node.remove());
   return normalizeText(doc.body.textContent || '');
 }
+
+// Convert feed article markup to plain-text paragraphs without rendering feed HTML.
+// This preserves readable paragraph breaks while keeping scripts and embedded markup out.
+function articleTextWithParagraphs(value) {
+  if (!value) return '';
+  const raw = String(value);
+  const doc = new DOMParser().parseFromString(raw, 'text/html');
+  doc.querySelectorAll('script,style,noscript,svg,iframe,form,nav,footer,header').forEach(node => node.remove());
+  const blockTags = new Set(['ADDRESS','ARTICLE','BLOCKQUOTE','DIV','DL','DT','DD','FIGCAPTION','H1','H2','H3','H4','H5','H6','LI','P','PRE','SECTION','TABLE','TR']);
+  const paragraphs = [];
+  const walk = (node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = normalizeText(node.nodeValue);
+      if (text) paragraphs.push(text);
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) return;
+    if (node.nodeType === Node.ELEMENT_NODE && ['SCRIPT','STYLE','NOSCRIPT','SVG','IFRAME','FORM'].includes(node.tagName)) return;
+    const isBlock = node.nodeType === Node.ELEMENT_NODE && blockTags.has(node.tagName);
+    const start = paragraphs.length;
+    for (const child of node.childNodes) walk(child);
+    if (isBlock && paragraphs.length > start) {
+      const merged = normalizeText(paragraphs.splice(start).join(' '));
+      if (merged) paragraphs.push(merged);
+    }
+  };
+  walk(doc.body);
+  const result = paragraphs.map(normalizeText).filter(Boolean).join('\\n\\n');
+  if (result) return result;
+  return raw.replace(/<br\\s*\\/?\\s*>/gi, '\\n').replace(/<\\/p\\s*>/gi, '\\n\\n').replace(/<[^>]*>/g, ' ').split(/\\n+/).map(normalizeText).filter(Boolean).join('\\n\\n') || normalizeText(raw);
+}
 function firstImageFromHtml(value, base) {
   if (!value) return '';
   const doc = new DOMParser().parseFromString(String(value), 'text/html');
@@ -389,7 +420,7 @@ function parseJsonFeed(data, base) {
         if (attachment) image = safeUrl(attachment.url, base);
       }
       const authors = Array.isArray(item.authors) ? item.authors.map(author => author && author.name).filter(Boolean).join(', ') : '';
-      return { title: normalizeText(item.title) || translate('untitled'), url: safeUrl(item.url || item.external_url || '', base), summary: trimSummary(item.summary || item.content_text || htmlToText(item.content_html || ''), 340), content: htmlToText(item.content_html || item.content_text || item.summary || ''), image, date: item.date_published || item.date_modified || '', author: normalizeText(authors) };
+      return { title: normalizeText(item.title) || translate('untitled'), url: safeUrl(item.url || item.external_url || '', base), summary: trimSummary(item.summary || item.content_text || htmlToText(item.content_html || ''), 340), content: articleTextWithParagraphs(item.content_html || item.content_text || item.summary || ''), image, date: item.date_published || item.date_modified || '', author: normalizeText(authors) };
     }),
   };
 }
@@ -420,7 +451,7 @@ function parseXmlFeed(text, base) {
     const desc = summaryNode ? summaryNode.textContent : bodyMarkup;
     const date = directText(item, ['published', 'pubdate', 'updated', 'date', 'issued', 'modified']);
     const author = directText(item, ['creator', 'author', 'name']) || descendantText(directChild(item, ['author']), ['name']);
-    return { title: titleText, url: safeUrl(linkRaw, base), summary: trimSummary(htmlToText(desc), 340), content: htmlToText(bodyMarkup || desc), image: xmlItemImage(item, base, bodyMarkup || desc), date, author };
+    return { title: titleText, url: safeUrl(linkRaw, base), summary: trimSummary(htmlToText(desc), 340), content: articleTextWithParagraphs(bodyMarkup || desc), image: xmlItemImage(item, base, bodyMarkup || desc), date, author };
   });
   return { title, description, homeUrl: safeUrl(homeRaw, base), image: safeUrl(logoRaw, base), items };
 }
@@ -606,7 +637,12 @@ function openArticleModal(item, url) {
   const body = $('#modalArticleBody'); body.replaceChildren();
   if (item.image) { const image = document.createElement('img'); image.className = 'modal-article-image'; image.src = item.image; image.alt = ''; image.referrerPolicy = 'no-referrer'; image.addEventListener('error', () => image.remove(), {once:true}); body.appendChild(image); }
   const text = item.content || item.summary || translate('feedDetailsUnavailable');
-  const paragraph = document.createElement('p'); paragraph.textContent = text; body.appendChild(paragraph);
+  const blocks = String(text).replace(/\\r\\n?/g, '\\n').split(/\\n[ \\t]*\\n+/).map(part => part.replace(/\\s*\\n\\s*/g, ' ').trim()).filter(Boolean);
+  for (const block of blocks) {
+    const paragraph = document.createElement('p');
+    paragraph.textContent = block;
+    body.appendChild(paragraph);
+  }
   modal.hidden = false; document.body.classList.add('modal-open'); $('#closeArticleModal').focus();
 }
 function closeArticleModal() { $('#articleModal').hidden = true; document.body.classList.remove('modal-open'); }
