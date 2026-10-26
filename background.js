@@ -746,10 +746,10 @@ function feedPathHint(url) {
   );
   // Google News uses /rss/ for feeds, but /rss/articles/ can be an article
   // destination. Keep the broad feed-path support while excluding article URLs.
-  const isGoogleNews = /(?:^|\\.)news\\.google\\.com$/i.test(url.hostname.toLowerCase());
+  const isGoogleNews = /(?:^|\.)news\.google\.com$/i.test(url.hostname.toLowerCase());
   const googleNewsRssPath = isGoogleNews
-    && !/^\\/rss\\/articles(?:\\/|$)/i.test(path)
-    && /(?:^|\\/)rss(?:\\/|$)/i.test(path);
+    && !/^\/rss\/articles(?:\/|$)/i.test(path)
+    && /(?:^|\/)rss(?:\/|$)/i.test(path);
   return googleNewsRssPath
     || isKnownFeedHost(url)
     || hasFeedQuery
