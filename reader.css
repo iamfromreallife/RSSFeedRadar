@@ -810,3 +810,17 @@ body.dark-mode .font-select-control .font-select-option:focus-visible { outline-
     font-size:calc(var(--reading-size) + 4px) !important;
   }
 }
+
+
+/* Compact the feed header: remove the redundant title/subtitle and align count before subscriptions. */
+.stories-section-header { display:flex; align-items:center; justify-content:flex-end; min-height:0; margin:0 0 8px; padding:0; }
+.story-count-inline { display:flex; flex:0 0 auto; flex-direction:row; align-items:baseline; justify-content:flex-end; gap:6px; margin:0 0 0 auto; text-align:right; white-space:nowrap; }
+.story-count-inline strong { font-size:20px; line-height:1; letter-spacing:-.03em; }
+.story-count-inline span { font-size:9px; letter-spacing:.12em; }
+.subscribe-inline { margin-top:0 !important; margin-bottom:20px !important; align-items:center; }
+.subscribe-inline-label { display:none !important; }
+@media(max-width:620px) {
+  .stories-section-header { margin-bottom:6px; }
+  .story-count-inline strong { font-size:18px; }
+  .subscribe-inline { margin-bottom:16px !important; }
+}
