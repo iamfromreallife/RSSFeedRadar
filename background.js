@@ -836,3 +836,45 @@ chrome.webRequest.onHeadersReceived.addListener((details) => {
 chrome.tabs.onRemoved.addListener((tabId) => {
   latestMainFrameRequestByTab.delete(tabId);
 });
+
+
+// Fallback for feed links whose servers label the response as generic XML or
+// JSON. webRequest MIME checks alone can miss these, so also inspect committed
+// top-level navigations with feed-like URLs.
+const previewFallbackByTab = new Map();
+if (chrome.webNavigation?.onCommitted) {
+  chrome.webNavigation.onCommitted.addListener((details) => {
+    if (details.frameId !== 0 || details.tabId < 0) return;
+    let url;
+    try { url = new URL(details.url); } catch (_) { return; }
+    if (!['http:', 'https:'].includes(url.protocol)) return;
+    if (isOEmbedUrl(url.href) || isYouTubeNavigationFeedUrl(url.href)) return;
+
+    const path = (() => {
+      try { return decodeURIComponent(url.pathname || '').toLowerCase(); }
+      catch (_) { return String(url.pathname || '').toLowerCase(); }
+    })();
+    const excludedXml = /(?:^|\/)(?:sitemap(?:[-_][^/]*)?|crossdomain|clientaccesspolicy)\.xml$/i.test(path);
+    const feedLike = feedPathHint(url)
+      || (/\.(?:rss|atom|rdf|xml|json)$/i.test(path) && !excludedXml);
+    if (!feedLike) return;
+
+    const previous = previewFallbackByTab.get(details.tabId);
+    if (previous === details.url) return;
+    previewFallbackByTab.set(details.tabId, details.url);
+
+    chrome.storage.local.get(DEFAULT_PREVIEWER_STORAGE_KEY).then(async (stored) => {
+      if (stored[DEFAULT_PREVIEWER_STORAGE_KEY] !== true) return;
+      let tab;
+      try { tab = await chrome.tabs.get(details.tabId); } catch (_) { return; }
+      // Do not redirect if the user has already navigated away while storage was read.
+      if (!tab?.url || tab.url !== details.url) return;
+      const feedUrl = safeUrl(details.url);
+      if (!feedUrl) return;
+      const params = new URLSearchParams({ url: feedUrl, title: feedPreviewTitle(feedUrl) });
+      const readerUrl = chrome.runtime.getURL('reader.html?' + params.toString());
+      try { await chrome.tabs.update(details.tabId, { url: readerUrl }); }
+      catch (_) { previewFallbackByTab.delete(details.tabId); }
+    }).catch(() => {});
+  });
+}
