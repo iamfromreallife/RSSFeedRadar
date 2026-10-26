@@ -729,6 +729,14 @@ const DEFAULT_PREVIEWER_STORAGE_KEY = 'rssFeedRadarDefaultPreviewer';
 const latestMainFrameRequestByTab = new Map();
 const handledFeedRequestIds = new Map();
 
+function isKnownFeedHost(url) {
+  const host = String(url.hostname || '').toLowerCase().replace(/^www\./, '');
+  // FeedBurner commonly publishes valid feeds at /<feed-name> without an
+  // extension or a /feed/ path segment.
+  return host === 'feeds.feedburner.com'
+    || host === 'feedproxy.google.com';
+}
+
 function feedPathHint(url) {
   let path = String(url.pathname || '').toLowerCase();
   try { path = decodeURIComponent(path); } catch (_) { /* Keep encoded path for matching. */ }
@@ -736,7 +744,8 @@ function feedPathHint(url) {
   const hasFeedQuery = ['feed', 'format', 'output', 'type'].some((key) =>
     /^(?:rss2?|atom|json|jsonfeed)$/i.test(params.get(key) || '')
   );
-  return hasFeedQuery
+  return isKnownFeedHost(url)
+    || hasFeedQuery
     || /\.(?:rss|atom|rdf)(?:\.xml)?$/i.test(path)
     || /(?:^|\/)feeds?(?:\/|$)/i.test(path)
     || /(?:^|\/)(?:feed|rss|atom)(?:\.(?:xml|json))?\/?$/i.test(path)
@@ -831,7 +840,7 @@ chrome.webRequest.onHeadersReceived.addListener((details) => {
       handledFeedRequestIds.delete(details.requestId);
     }
   }).catch(() => {});
-}, { urls: ['http://*/*', 'https://*/*'], types: ['main_frame'] }, ['responseHeaders']);
+}, { urls: ['http://*/*', 'https://*/*'], types: ['main_frame'] }, ['responseHeaders', 'extraHeaders']);
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   latestMainFrameRequestByTab.delete(tabId);
