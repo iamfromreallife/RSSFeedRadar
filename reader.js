@@ -60,8 +60,14 @@ function translate(key, vars = {}) {
   return value;
 }
 const FONT_FAMILIES = {
-  system: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  inter: 'Inter, ui-sans-serif, sans-serif', roboto: 'Roboto, Arial, sans-serif', opensans: '"Open Sans", Arial, sans-serif', lato: 'Lato, Arial, sans-serif', montserrat: 'Montserrat, Arial, sans-serif', nunito: 'Nunito, Arial, sans-serif',
+  // Use installed, broadly available families so choices visibly apply offline in an extension page.
+  system: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  inter: 'Arial, Helvetica, sans-serif',
+  roboto: '"Segoe UI", Tahoma, sans-serif',
+  opensans: 'Verdana, Geneva, sans-serif',
+  lato: '"Trebuchet MS", Arial, sans-serif',
+  montserrat: 'Tahoma, Geneva, sans-serif',
+  nunito: '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif',
   serif: 'Georgia, "Times New Roman", serif', times: '"Times New Roman", Times, serif', palatino: 'Palatino, "Palatino Linotype", serif', garamond: 'Garamond, "Times New Roman", serif',
   arial: 'Arial, Helvetica, sans-serif', helvetica: 'Helvetica, Arial, sans-serif', tahoma: 'Tahoma, Geneva, sans-serif', verdana: 'Verdana, Geneva, sans-serif', trebuchet: '"Trebuchet MS", sans-serif',
   mono: '"Courier New", Courier, monospace', consolas: 'Consolas, "Courier New", monospace', lucida: '"Lucida Console", Monaco, monospace',
