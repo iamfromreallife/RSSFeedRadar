@@ -172,6 +172,7 @@ function setLanguage(nextLanguage) {
   t = DICTIONARY[language];
   locale = localeMap[language] || 'en-US';
   try { localStorage.setItem('rssFeedRadarReaderLanguage', language); } catch (_) { /* Ignore unavailable local storage. */ }
+  try { chrome.storage?.local?.set({ rssFeedRadarLanguage: language }); } catch (_) { /* Sync with the extension popup when available. */ }
   const nextParams = new URLSearchParams(location.search);
   nextParams.set('language', language);
   try { history.replaceState(null, '', `${location.pathname}?${nextParams.toString()}${location.hash}`); } catch (_) { /* Ignore restricted history changes. */ }
@@ -672,6 +673,15 @@ defaultPreviewerToggle?.addEventListener('change', async () => {
   }
 });
 
+chrome.storage?.onChanged?.addListener((changes, areaName) => {
+  if (areaName !== 'local' || !changes.rssFeedRadarLanguage) return;
+  const nextLanguage = changes.rssFeedRadarLanguage.newValue;
+  if (DICTIONARY[nextLanguage] && nextLanguage !== language) setLanguage(nextLanguage);
+});
+chrome.storage?.local?.get('rssFeedRadarLanguage').then(stored => {
+  const nextLanguage = stored?.rssFeedRadarLanguage;
+  if (DICTIONARY[nextLanguage] && nextLanguage !== language) setLanguage(nextLanguage);
+}).catch(() => {});
 chrome.storage?.onChanged?.addListener((changes, areaName) => {
   if (areaName !== 'local' || !changes[DEFAULT_PREVIEWER_STORAGE_KEY] || !defaultPreviewerToggle) return;
   defaultPreviewerToggle.checked = changes[DEFAULT_PREVIEWER_STORAGE_KEY].newValue === true;
