@@ -592,8 +592,17 @@ function renderStories(items, base) {
     content.append(meta, title);
     if (item.summary) { const summary = document.createElement('p'); summary.className = 'story-summary'; summary.textContent = item.summary; content.appendChild(summary); }
     const read = document.createElement('span'); read.className = 'story-read'; read.append(document.createTextNode(translate('openArticle'))); read.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M5 3h8v8"/></svg>'); content.appendChild(read);
-    const open = () => openArticleModal(item, safeUrl(item.url, base));
-    card.addEventListener('click', open); card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
+    const articleUrl = () => safeUrl(item.url, base);
+    const open = () => openArticleModal(item, articleUrl());
+    card.addEventListener('click', open);
+    card.addEventListener('auxclick', event => {
+      if (event.button !== 1) return;
+      const url = articleUrl();
+      if (!url) return;
+      event.preventDefault();
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+    card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
     card.append(imageWrap, content); fragment.appendChild(card);
   });
   storiesGrid.appendChild(fragment);
@@ -610,8 +619,17 @@ function renderStories(items, base) {
       const meta = document.createElement('span'); meta.className = 'feed-info-article-meta'; meta.textContent = formatDate(item.date) || translate('unknownDate');
       copy.append(heading, excerpt, meta); row.appendChild(copy);
       if (item.image) { const img = document.createElement('img'); img.className = 'feed-info-article-image'; img.src = item.image; img.alt = ''; img.loading = index < 3 ? 'eager' : 'lazy'; img.referrerPolicy = 'no-referrer'; img.addEventListener('error', () => img.remove(), {once:true}); row.appendChild(img); }
-      const open = () => openArticleModal(item, safeUrl(item.url, base));
-      row.addEventListener('click', open); row.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
+      const articleUrl = () => safeUrl(item.url, base);
+      const open = () => openArticleModal(item, articleUrl());
+      row.addEventListener('click', open);
+      row.addEventListener('auxclick', event => {
+        if (event.button !== 1) return;
+        const url = articleUrl();
+        if (!url) return;
+        event.preventDefault();
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+      row.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
       detailsList.appendChild(row);
     });
   }
