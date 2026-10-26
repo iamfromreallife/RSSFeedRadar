@@ -9,7 +9,6 @@
     "clipboardWrite",
     "scripting",
     "webNavigation",
-    "alarms",
     "webRequest"
   ],
   "host_permissions": [
