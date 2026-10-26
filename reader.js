@@ -210,7 +210,7 @@ function applyTranslations() {
     feedTitleEl.textContent = lastFeedData.title || initialTitle || hostname(feedUrl) || translate('feedFallback');
     feedDescriptionEl.textContent = lastFeedData.description || `${hostname(lastFeedData.homeUrl || feedUrl)} · ${lastFeedData.items.length === 1 ? translate('countOne') : translate('countMany', { count: lastFeedData.items.length })}`;
     storyCountEl.textContent = String(lastFeedData.items.length);
-    storiesSubtitle.textContent = lastFeedData.items.length === 1 ? translate('countOne') : translate('countMany', { count: lastFeedData.items.length });
+    if (storiesSubtitle) storiesSubtitle.textContent = lastFeedData.items.length === 1 ? translate('countOne') : translate('countMany', { count: lastFeedData.items.length });
     if (lastFeedData.items.length) {
       renderStories(lastFeedData.items, feedUrl);
       sourceNote.hidden = false;
@@ -491,7 +491,7 @@ async function fetchFeed() {
     $('#errorTitle').textContent = translate('oembedNotFeedTitle');
     $('#errorMessage').textContent = translate('oembedNotFeedBody');
     storyCountEl.textContent = '—';
-    storiesSubtitle.textContent = translate('storiesSubtitle');
+    if (storiesSubtitle) storiesSubtitle.textContent = translate('storiesSubtitle');
     return;
   }
 
@@ -501,7 +501,7 @@ async function fetchFeed() {
     $('#errorTitle').textContent = translate('youtubeSubscriptionsTitle');
     $('#errorMessage').textContent = translate('youtubeSubscriptionsBody');
     storyCountEl.textContent = '—';
-    storiesSubtitle.textContent = translate('storiesSubtitle');
+    if (storiesSubtitle) storiesSubtitle.textContent = translate('storiesSubtitle');
     return;
   }
 
@@ -545,14 +545,14 @@ async function fetchFeed() {
     feedUrlEl.textContent = feedUrl;
     if (data.items.length) {
       storyCountEl.textContent = String(data.items.length);
-      storiesSubtitle.textContent = data.items.length === 1 ? translate('countOne') : translate('countMany', { count: data.items.length });
+      if (storiesSubtitle) storiesSubtitle.textContent = data.items.length === 1 ? translate('countOne') : translate('countMany', { count: data.items.length });
       renderStories(data.items, feedUrl);
       sourceNote.hidden = false;
     } else {
       storyCountEl.textContent = '0';
       loadingState.hidden = true;
       emptyState.hidden = false;
-      storiesSubtitle.textContent = translate('storiesSubtitle');
+      if (storiesSubtitle) storiesSubtitle.textContent = translate('storiesSubtitle');
     }
   } catch (error) {
     loadingState.hidden = true;
@@ -568,7 +568,7 @@ async function fetchFeed() {
       $('#errorMessage').textContent = `${translate('feedUnavailableBody')} (${error?.message || 'Network error'})`;
     }
     storyCountEl.textContent = '—';
-    storiesSubtitle.textContent = translate('storiesSubtitle');
+    if (storiesSubtitle) storiesSubtitle.textContent = translate('storiesSubtitle');
   } finally {
     loadingState.hidden = true;
   }
