@@ -1,0 +1,40 @@
+name: Package extension
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'background.js'
+      - 'content.js'
+      - 'manifest.json'
+      - 'popup.css'
+      - 'popup.html'
+      - 'popup.js'
+      - 'reader.css'
+      - 'reader.html'
+      - 'reader.js'
+      - 'icons/**'
+      - '.github/workflows/package-extension.yml'
+permissions:
+  contents: read
+  actions: write
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate extension files
+        run: |
+          node --check background.js
+          node --check content.js
+          node --check popup.js
+          node --check reader.js
+          python -m json.tool manifest.json >/dev/null
+      - name: Create extension ZIP
+        run: zip -r RSSFeedRadar.zip manifest.json background.js content.js popup.css popup.html popup.js reader.css reader.html reader.js icons
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RSSFeedRadar-extension
+          path: RSSFeedRadar.zip
+          if-no-files-found: error
+          retention-days: 14
