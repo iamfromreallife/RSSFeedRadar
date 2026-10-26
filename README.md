@@ -16,6 +16,9 @@ A Manifest V3 Chrome extension that discovers RSS, Atom, and JSON Feed links on 
 - Discovery from standard RSS/Atom/JSON Feed declarations, visible feed links, and common platform-specific feed URL patterns.
 - Local page state; no analytics or external tracking service.
 
+NOTE: v2 of RSS Feeds Radar includes a major layout redesign with better readability.
+
+
 ## Install in Chrome
 
 1. Extract the ZIP to a permanent folder.
@@ -32,17 +35,13 @@ Selecting **Preview and subscribe** opens a new reader tab. The reader parses RS
 
 ### Screenshots
 
-**Extension popup**
+<img width="996" height="842" alt="Captura de ecrã 2026-10-26 113909" src="https://github.com/user-attachments/assets/e02a9ea9-7b34-4ecf-b975-442b10d0e369" />
+<img width="1428" height="747" alt="Captura de ecrã 2026-10-26 114116" src="https://github.com/user-attachments/assets/8e4b87c5-69fb-4962-97d7-1d35675ba7e1" />
+<img width="1438" height="751" alt="Captura de ecrã 2026-10-26 114054" src="https://github.com/user-attachments/assets/c43d5044-1ce9-412c-977d-afd1ca3c45ac" />
+<img width="1432" height="753" alt="Captura de ecrã 2026-10-26 114032" src="https://github.com/user-attachments/assets/04c11adc-62d1-48a6-a426-7244727fe39a" />
 
-<img width="491" height="550" alt="RSS Feed Radar extension popup" src="https://github.com/user-attachments/assets/9b2ae670-2f84-446c-86d2-9937c40e892d" />
+<img width="1400" height="753" alt="Captura de ecrã 2026-10-26 114011" src="https://github.com/user-attachments/assets/5d99ae9c-d1a2-4a65-8a9d-ab4956f10867" />
 
-**Feed reader**
-
-<img width="1280" height="800" alt="RSS Feed Radar reader preview" src="https://github.com/user-attachments/assets/e61623a1-39f2-4aeb-97f5-c6b9ea7d78dd" />
-
-<img width="1280" height="800" alt="RSS Feed Radar reader cards view" src="https://github.com/user-attachments/assets/30c62fe6-1187-4d80-814a-6d8a5614e89b" />
-
-<img width="1280" height="800" alt="RSS Feed Radar reader list view" src="https://github.com/user-attachments/assets/2e6cd4c8-e199-45dc-9bf4-979b0e259cb9" />
 
 
 ## Notes
@@ -51,12 +50,6 @@ Selecting **Preview and subscribe** opens a new reader tab. The reader parses RS
 - The toolbar badge is capped visually at `99+`; the popup displays the actual count.
 - Some feed servers block direct cross-origin requests. In that case, the reader displays an error and keeps the feed URL available for external reader services.
 
-
-### Version 1.5.2 — Reddit feed rate-limit handling
-
-- Skip broad domain probing on Reddit pages to avoid unnecessary requests to its rate-limited RSS endpoints.
-- Keep canonical Reddit `.rss` and `.atom` candidates without pre-fetch validation, so opening a preview triggers the actual feed request instead of a validation request followed by an immediate second request.
-- Show a localized HTTP 429 message and respect `Retry-After` when available; otherwise apply a 60-second cooldown before retrying.
 
 
 ### Update checker
