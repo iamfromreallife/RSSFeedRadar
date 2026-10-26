@@ -598,6 +598,7 @@ function renderStories(items, base) {
       if (event.button !== 0) return;
       open();
     });
+    // Use mousedown so opening the original stays within the user's direct mouse gesture.
     // Handle the middle button on mousedown for consistent browser activation.
     card.addEventListener('mousedown', event => {
       if (event.button !== 1) return;
