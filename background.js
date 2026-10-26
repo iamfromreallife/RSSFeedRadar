@@ -485,18 +485,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  if (message?.type === 'GET_UPDATE_STATE') {
-    chrome.storage.local.get(UPDATE_STORAGE_KEY)
-      .then((stored) => sendResponse(stored[UPDATE_STORAGE_KEY] || { updateAvailable: false, checkedAt: 0 }))
-      .catch(() => sendResponse({ updateAvailable: false, checkedAt: 0 }));
-    return true;
-  }
-  if (message?.type === 'CHECK_UPDATES_NOW') {
-    checkRepositoryForUpdates({ force: message.force === true })
-      .then((state) => sendResponse(state || { updateAvailable: false, checkedAt: Date.now() }))
-      .catch((error) => sendResponse({ updateAvailable: false, checkedAt: Date.now(), lastCheckError: String(error?.message || error) }));
-    return true;
-  }
 
   return false;
 });
