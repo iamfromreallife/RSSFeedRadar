@@ -1,26 +1,26 @@
 const TRANSLATIONS = {
   en: {
-    tagline: 'Your feed radar', donate: 'Donate', updateAvailable: 'Update available', checkUpdates: 'Check for updates', checkingUpdates: 'Checking for updates…', upToDate: 'You’re up to date', updateCheckFailed: 'Could not check for updates', scanStatus: 'PAGE SCAN', heroTitle: 'A little feed<br>magic.', heroSubtitle: 'Every feed on this page, gathered in one place.', foundLabel: 'FOUND', availableFeeds: 'Available feeds', searching: 'Looking for feeds on this page…', scanAgain: 'Scan again',
+    tagline: 'Your feed radar', donate: 'Donate', scanStatus: 'PAGE SCAN', heroTitle: 'A little feed<br>magic.', heroSubtitle: 'Every feed on this page, gathered in one place.', foundLabel: 'FOUND', availableFeeds: 'Available feeds', searching: 'Looking for feeds on this page…', scanAgain: 'Scan again',
     emptyTitle: 'No feeds found just yet', emptyBody: 'This page may not publish a feed, or it may be using a format we don’t recognize yet.', privacyNote: 'Local discovery · No tracking', subscribe: 'Preview and subscribe', inoreader: 'Inoreader', feedly: 'Feedly', copyFeedUrl: 'Copy feed URL', copied: 'Feed URL copied', copyFailed: 'Could not copy this URL', scanFailed: 'This page cannot be scanned by Chrome extensions.', scanAgainLabel: 'Scanning this page…', oneFeed: '1 feed discovered on this page', manyFeeds: '{count} feeds discovered on this page', noFeeds: 'No feeds discovered on this page', feedFallback: 'Website feed'
   },
   pt: {
-    tagline: 'O teu radar de feeds', donate: 'Doar', updateAvailable: 'Atualização disponível', checkUpdates: 'Verificar atualizações', checkingUpdates: 'A verificar atualizações…', upToDate: 'A extensão está atualizada', updateCheckFailed: 'Não foi possível verificar atualizações', scanStatus: 'ANÁLISE DA PÁGINA', heroTitle: 'Um pouco de<br>magia RSS.', heroSubtitle: 'Todos os feeds desta página, reunidos num só lugar.', foundLabel: 'ENCONTRADOS', availableFeeds: 'Feeds disponíveis', searching: 'À procura de feeds nesta página…', scanAgain: 'Voltar a analisar',
+    tagline: 'O teu radar de feeds', donate: 'Doar', scanStatus: 'ANÁLISE DA PÁGINA', heroTitle: 'Um pouco de<br>magia RSS.', heroSubtitle: 'Todos os feeds desta página, reunidos num só lugar.', foundLabel: 'ENCONTRADOS', availableFeeds: 'Feeds disponíveis', searching: 'À procura de feeds nesta página…', scanAgain: 'Voltar a analisar',
     emptyTitle: 'Ainda não foram encontrados feeds', emptyBody: 'Esta página pode não publicar um feed ou usar um formato que ainda não reconhecemos.', privacyNote: 'Deteção local · Sem rastreio', subscribe: 'Pré-visualizar e subscrever', inoreader: 'Inoreader', feedly: 'Feedly', copyFeedUrl: 'Copiar URL do feed', copied: 'URL do feed copiado', copyFailed: 'Não foi possível copiar este URL', scanFailed: 'Esta página não pode ser analisada por extensões do Chrome.', scanAgainLabel: 'A analisar esta página…', oneFeed: '1 feed encontrado nesta página', manyFeeds: '{count} feeds encontrados nesta página', noFeeds: 'Não foram encontrados feeds nesta página', feedFallback: 'Feed do site'
   },
   es: {
-    tagline: 'Tu radar de feeds', donate: 'Donar', updateAvailable: 'Actualización disponible', checkUpdates: 'Buscar actualizaciones', checkingUpdates: 'Buscando actualizaciones…', upToDate: 'Está todo actualizado', updateCheckFailed: 'No se pudieron comprobar las actualizaciones', scanStatus: 'ANÁLISIS DE PÁGINA', heroTitle: 'Un poco de<br>magia RSS.', heroSubtitle: 'Todos los feeds de esta página, reunidos en un solo lugar.', foundLabel: 'ENCONTRADOS', availableFeeds: 'Feeds disponibles', searching: 'Buscando feeds en esta página…', scanAgain: 'Volver a analizar',
+    tagline: 'Tu radar de feeds', donate: 'Donar', scanStatus: 'ANÁLISIS DE PÁGINA', heroTitle: 'Un poco de<br>magia RSS.', heroSubtitle: 'Todos los feeds de esta página, reunidos en un solo lugar.', foundLabel: 'ENCONTRADOS', availableFeeds: 'Feeds disponibles', searching: 'Buscando feeds en esta página…', scanAgain: 'Volver a analizar',
     emptyTitle: 'Aún no se encontraron feeds', emptyBody: 'Puede que esta página no publique un feed o que utilice un formato que aún no reconocemos.', privacyNote: 'Detección local · Sin seguimiento', subscribe: 'Vista previa y suscripción', inoreader: 'Inoreader', feedly: 'Feedly', copyFeedUrl: 'Copiar URL del feed', copied: 'URL del feed copiada', copyFailed: 'No se pudo copiar esta URL', scanFailed: 'Las extensiones de Chrome no pueden analizar esta página.', scanAgainLabel: 'Analizando esta página…', oneFeed: 'Se encontró 1 feed en esta página', manyFeeds: 'Se encontraron {count} feeds en esta página', noFeeds: 'No se encontraron feeds en esta página', feedFallback: 'Feed del sitio'
   },
   it: {
-    tagline: 'Il tuo radar dei feed', donate: 'Dona', updateAvailable: 'Aggiornamento disponibile', checkUpdates: 'Controlla aggiornamenti', checkingUpdates: 'Controllo aggiornamenti…', upToDate: 'È tutto aggiornato', updateCheckFailed: 'Impossibile verificare gli aggiornamenti', scanStatus: 'SCANSIONE PAGINA', heroTitle: 'Un pizzico di<br>magia RSS.', heroSubtitle: 'Tutti i feed di questa pagina, raccolti in un unico posto.', foundLabel: 'TROVATI', availableFeeds: 'Feed disponibili', searching: 'Ricerca dei feed in questa pagina…', scanAgain: 'Scansiona di nuovo',
+    tagline: 'Il tuo radar dei feed', donate: 'Dona', scanStatus: 'SCANSIONE PAGINA', heroTitle: 'Un pizzico di<br>magia RSS.', heroSubtitle: 'Tutti i feed di questa pagina, raccolti in un unico posto.', foundLabel: 'TROVATI', availableFeeds: 'Feed disponibili', searching: 'Ricerca dei feed in questa pagina…', scanAgain: 'Scansiona di nuovo',
     emptyTitle: 'Nessun feed trovato per ora', emptyBody: 'Questa pagina potrebbe non pubblicare un feed o utilizzare un formato che non riconosciamo ancora.', privacyNote: 'Rilevamento locale · Nessun tracciamento', subscribe: 'Anteprima e iscrizione', inoreader: 'Inoreader', feedly: 'Feedly', copyFeedUrl: 'Copia URL del feed', copied: 'URL del feed copiato', copyFailed: 'Impossibile copiare questo URL', scanFailed: 'Le estensioni di Chrome non possono analizzare questa pagina.', scanAgainLabel: 'Scansione della pagina…', oneFeed: '1 feed trovato in questa pagina', manyFeeds: '{count} feed trovati in questa pagina', noFeeds: 'Nessun feed trovato in questa pagina', feedFallback: 'Feed del sito'
   },
   fr: {
-    tagline: 'Votre radar de flux', donate: 'Faire un don', updateAvailable: 'Mise à jour disponible', checkUpdates: 'Vérifier les mises à jour', checkingUpdates: 'Vérification des mises à jour…', upToDate: 'Vous êtes à jour', updateCheckFailed: 'Impossible de vérifier les mises à jour', scanStatus: 'ANALYSE DE LA PAGE', heroTitle: 'Un peu de<br>magie RSS.', heroSubtitle: 'Tous les flux de cette page, réunis au même endroit.', foundLabel: 'TROUVÉS', availableFeeds: 'Flux disponibles', searching: 'Recherche de flux sur cette page…', scanAgain: 'Analyser à nouveau',
+    tagline: 'Votre radar de flux', donate: 'Faire un don', scanStatus: 'ANALYSE DE LA PAGE', heroTitle: 'Un peu de<br>magie RSS.', heroSubtitle: 'Tous les flux de cette page, réunis au même endroit.', foundLabel: 'TROUVÉS', availableFeeds: 'Flux disponibles', searching: 'Recherche de flux sur cette page…', scanAgain: 'Analyser à nouveau',
     emptyTitle: 'Aucun flux trouvé pour le moment', emptyBody: 'Cette page ne publie peut-être pas de flux ou utilise un format que nous ne reconnaissons pas encore.', privacyNote: 'Détection locale · Aucun suivi', subscribe: 'Aperçu et abonnement', inoreader: 'Inoreader', feedly: 'Feedly', copyFeedUrl: 'Copier l’URL du flux', copied: 'URL du flux copiée', copyFailed: 'Impossible de copier cette URL', scanFailed: 'Les extensions Chrome ne peuvent pas analyser cette page.', scanAgainLabel: 'Analyse de cette page…', oneFeed: '1 flux détecté sur cette page', manyFeeds: '{count} flux détectés sur cette page', noFeeds: 'Aucun flux détecté sur cette page', feedFallback: 'Flux du site'
   },
   de: {
-    tagline: 'Dein Feed-Radar', donate: 'Spenden', updateAvailable: 'Update verfügbar', checkUpdates: 'Nach Updates suchen', checkingUpdates: 'Suche nach Updates…', upToDate: 'Du bist auf dem neuesten Stand', updateCheckFailed: 'Updates konnten nicht geprüft werden', scanStatus: 'SEITENSCAN', heroTitle: 'Ein bisschen<br>Feed-Magie.', heroSubtitle: 'Alle Feeds dieser Seite an einem Ort gesammelt.', foundLabel: 'GEFUNDEN', availableFeeds: 'Verfügbare Feeds', searching: 'Suche nach Feeds auf dieser Seite…', scanAgain: 'Erneut scannen',
+    tagline: 'Dein Feed-Radar', donate: 'Spenden', scanStatus: 'SEITENSCAN', heroTitle: 'Ein bisschen<br>Feed-Magie.', heroSubtitle: 'Alle Feeds dieser Seite an einem Ort gesammelt.', foundLabel: 'GEFUNDEN', availableFeeds: 'Verfügbare Feeds', searching: 'Suche nach Feeds auf dieser Seite…', scanAgain: 'Erneut scannen',
     emptyTitle: 'Noch keine Feeds gefunden', emptyBody: 'Diese Seite veröffentlicht möglicherweise keinen Feed oder verwendet ein Format, das wir noch nicht erkennen.', privacyNote: 'Lokale Erkennung · Kein Tracking', subscribe: 'Vorschau & abonnieren', inoreader: 'Inoreader', feedly: 'Feedly', copyFeedUrl: 'Feed-URL kopieren', copied: 'Feed-URL kopiert', copyFailed: 'Diese URL konnte nicht kopiert werden', scanFailed: 'Diese Seite kann nicht von Chrome-Erweiterungen gescannt werden.', scanAgainLabel: 'Diese Seite wird gescannt…', oneFeed: '1 Feed auf dieser Seite gefunden', manyFeeds: '{count} Feeds auf dieser Seite gefunden', noFeeds: 'Keine Feeds auf dieser Seite gefunden', feedFallback: 'Website-Feed'
   }
 };
@@ -36,9 +36,9 @@ const languageButton = $('#languageButton');
 const languageCurrent = $('#languageCurrent');
 const languageMenu = $('#languageMenu');
 const rescanButton = $('#rescanButton');
-const checkUpdatesButton = $('#checkUpdatesButton');
+
 const footerVersion = $('#footerVersion');
-const updateAvailableButton = $('#updateAvailableButton');
+
 const toast = $('#toast');
 let currentTabId = null;
 let activeFeeds = [];
@@ -78,7 +78,7 @@ function applyTranslations() {
     else element.textContent = translate(key);
   });
   document.querySelectorAll('[data-i18n-title]').forEach((element) => element.title = translate(element.getAttribute('data-i18n-title')));
-  if (checkUpdatesButton) checkUpdatesButton.setAttribute('aria-label', translate('checkUpdates'));
+
   if (footerVersion && chrome.runtime?.getManifest) footerVersion.textContent = chrome.runtime.getManifest().version;
   renderFeeds(activeFeeds);
 }
@@ -266,60 +266,7 @@ chrome.runtime.onMessage.addListener((message) => {
     syncLanguageDropdown();
   }
   applyTranslations();
-  await checkUpdatesOnPopupOpen();
+
   await loadCurrentTab();
 })();
 
-
-function renderUpdateAvailability(state) {
-  if (!updateAvailableButton) return;
-  const installedVersion = chrome.runtime.getManifest().version;
-  const stateMatchesInstall = state?.installedVersion === installedVersion
-    && typeof state?.latestVersion === 'string';
-  updateAvailableButton.hidden = !(stateMatchesInstall && state.updateAvailable === true);
-  updateAvailableButton.title = stateMatchesInstall
-    ? `Installed ${installedVersion} · Latest ${state.latestVersion}`
-    : translate('checkUpdates');
-}
-
-async function checkUpdatesOnPopupOpen() {
-  try {
-    const state = await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW' });
-    renderUpdateAvailability(state);
-  } catch (_) {
-    await syncUpdateAvailability();
-  }
-}
-
-async function syncUpdateAvailability() {
-  try {
-    const state = await chrome.runtime.sendMessage({ type: 'GET_UPDATE_STATE' });
-    renderUpdateAvailability(state);
-  } catch (_) {
-    if (updateAvailableButton) updateAvailableButton.hidden = true;
-  }
-}
-chrome.runtime.onMessage.addListener((message) => {
-  if (message?.type === 'REPOSITORY_UPDATE_STATE') syncUpdateAvailability();
-});
-
-
-checkUpdatesButton?.addEventListener('click', async () => {
-  if (checkUpdatesButton.disabled) return;
-  checkUpdatesButton.disabled = true;
-  checkUpdatesButton.classList.add('is-checking');
-  showToast(translate('checkingUpdates'));
-  try {
-    const state = await chrome.runtime.sendMessage({ type: 'CHECK_UPDATES_NOW', force: true });
-    renderUpdateAvailability(state);
-    if (state?.lastCheckError) showToast(translate('updateCheckFailed'));
-    else if (state?.updateAvailable) showToast(translate('updateAvailable'));
-    else if (state?.current) showToast(translate('upToDate'));
-    else showToast(translate('updateCheckFailed'));
-  } catch (_) {
-    showToast(translate('updateCheckFailed'));
-  } finally {
-    checkUpdatesButton.disabled = false;
-    checkUpdatesButton.classList.remove('is-checking');
-  }
-});
