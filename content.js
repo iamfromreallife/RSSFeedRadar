@@ -187,10 +187,15 @@
       });
     };
 
-    const currentType = (document.contentType || '').toLowerCase();
-    const currentText = document.documentElement?.outerHTML?.slice(0, 5000) || '';
-    const documentFeedTitle = tidy(document.querySelector('channel > title, feed > title')?.textContent || document.title || location.hostname, 140);
-    if (/application\/(?:rss\+xml|x-rss\+xml|atom\+xml|feed\+json|rdf\+xml|xml)|text\/(?:xml|rss)/.test(currentType) && /<(?:rss|feed|rdf:rdf)\b/i.test(currentText)) {
+    const currentType = (document.contentType || '').toLowerCase().split(';')[0].trim();
+    const documentRoot = document.documentElement;
+    const rootName = String(documentRoot?.localName || documentRoot?.nodeName || '').toLowerCase().replace(/^.*:/, '');
+    const currentText = documentRoot?.outerHTML?.slice(0, 5000) || '';
+    const isFeedRoot = ['rss', 'feed', 'rdf'].includes(rootName)
+      || /<(?:rss|feed|rdf:rdf|rdf)\b/i.test(currentText);
+    const documentFeedTitle = tidy(document.querySelector('channel > title, feed > title, rdf > channel > title')?.textContent || document.title || location.hostname, 140);
+    const xmlFeedMime = /^(?:application\/(?:rss\+xml|x-rss\+xml|atom\+xml|feed\+json|rdf\+xml|xml|x-xml)|text\/(?:xml|rss|atom))$/.test(currentType);
+    if (xmlFeedMime && isFeedRoot) {
       add(location.href, documentFeedTitle, 'document');
     }
 
