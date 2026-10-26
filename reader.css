@@ -895,23 +895,3 @@ body.dark-mode .raw-feed-title-bar a{color:#111!important}
  .raw-feed-title-bar{margin-bottom:3px!important}
  .subscribe-inline{margin-bottom:7px!important;gap:6px!important}
 }
-
-/* Final compact vertical rhythm for the preview header and feed controls. */
-.nav-bar{height:58px!important;min-height:58px!important;padding-top:0!important;padding-bottom:0!important}
-.raw-feed-title-bar{margin:0 0 1px!important;padding:0!important}
-.raw-feed-title-bar a{line-height:1.02!important}
-.stories-section{padding-top:0!important}
-.stories-section-header{margin:0 0 0!important;padding:0!important;min-height:0!important}
-.subscribe-inline{margin-top:0!important;margin-bottom:6px!important;gap:8px!important}
-.subscribe-inline .story-count-inline{line-height:1!important}
-@media(max-width:900px){
- .nav-bar{height:auto!important;min-height:56px!important;padding:5px 0!important}
- .raw-feed-title-bar{margin-bottom:1px!important}
- .subscribe-inline{margin-bottom:5px!important;gap:7px!important}
-}
-@media(max-width:620px){
- .nav-bar{height:auto!important;min-height:0!important;padding:7px 0 5px!important}
- .raw-feed-title-bar{margin-bottom:2px!important}
- .raw-feed-title-bar a{line-height:1.05!important}
- .subscribe-inline{margin-bottom:4px!important;gap:6px!important}
-}
