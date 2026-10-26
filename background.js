@@ -37,7 +37,7 @@ function isOEmbedUrl(raw) {
   } catch (_) { return /(?:wp-json\/oembed|oembed\/1\.0\/embed)/i.test(String(raw || '')); }
 }
 
-function isInoreaderUrl(raw) {
+  try { return /(^|\.)inoreader\.com$/i.test(new URL(raw).hostname); }
   try { return /(^|\\.)inoreader\\.com$/i.test(new URL(raw).hostname); }
   catch (_) { return false; }
 }
@@ -46,7 +46,7 @@ function isInoreaderBlogFeed(raw) {
   try {
     const url = new URL(raw);
     return isInoreaderUrl(url.href)
-      && url.pathname.replace(/\\/+$/, '') === '/blog/feed'
+      && url.pathname.replace(/\/+$/, '') === '/blog/feed'
       && !url.search;
   } catch (_) { return false; }
 }
