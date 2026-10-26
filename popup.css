@@ -223,3 +223,14 @@ button, .subscribe-button, .menu-item, .donate-button, .icon-button, .language-w
 .app-shell { padding-top:14px; }
 .feeds-section { padding-top:8px; }
 .feed-list { max-height:390px; }
+
+
+/* Use the popup's full available height and anchor its footer at the bottom. */
+html, body { height: 600px; min-height: 600px; max-height: 600px; }
+.app-shell { height: 600px; min-height: 600px; display: flex; flex-direction: column; padding-bottom: 12px; }
+.topbar { flex: 0 0 auto; }
+.feeds-section { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; padding-top: 8px; }
+.section-heading { flex: 0 0 auto; }
+.feed-list { flex: 1 1 auto; min-height: 0; max-height: none; overflow-y: auto; }
+.empty-state { flex: 1 1 auto; }
+.footer-line { flex: 0 0 auto; margin-top: auto; padding-top: 12px; }
