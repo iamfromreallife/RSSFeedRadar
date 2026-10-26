@@ -311,34 +311,23 @@ function htmlToText(value) {
 }
 
 // Convert feed article markup to plain-text paragraphs without rendering feed HTML.
-// This preserves readable paragraph breaks while keeping scripts and embedded markup out.
+// Preserve block boundaries while keeping scripts and embedded markup out.
 function articleTextWithParagraphs(value) {
   if (!value) return '';
   const raw = String(value);
   const doc = new DOMParser().parseFromString(raw, 'text/html');
   doc.querySelectorAll('script,style,noscript,svg,iframe,form,nav,footer,header').forEach(node => node.remove());
-  const blockTags = new Set(['ADDRESS','ARTICLE','BLOCKQUOTE','DIV','DL','DT','DD','FIGCAPTION','H1','H2','H3','H4','H5','H6','LI','P','PRE','SECTION','TABLE','TR']);
-  const paragraphs = [];
-  const walk = (node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = normalizeText(node.nodeValue);
-      if (text) paragraphs.push(text);
-      return;
-    }
-    if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) return;
-    if (node.nodeType === Node.ELEMENT_NODE && ['SCRIPT','STYLE','NOSCRIPT','SVG','IFRAME','FORM'].includes(node.tagName)) return;
-    const isBlock = node.nodeType === Node.ELEMENT_NODE && blockTags.has(node.tagName);
-    const start = paragraphs.length;
-    for (const child of node.childNodes) walk(child);
-    if (isBlock && paragraphs.length > start) {
-      const merged = normalizeText(paragraphs.splice(start).join(' '));
-      if (merged) paragraphs.push(merged);
-    }
-  };
-  walk(doc.body);
-  const result = paragraphs.map(normalizeText).filter(Boolean).join('\\n\\n');
-  if (result) return result;
-  return raw.replace(/<br\\s*\\/?\\s*>/gi, '\\n').replace(/<\\/p\\s*>/gi, '\\n\\n').replace(/<[^>]*>/g, ' ').split(/\\n+/).map(normalizeText).filter(Boolean).join('\\n\\n') || normalizeText(raw);
+  const blockSelector = 'p,li,blockquote,pre,h1,h2,h3,h4,h5,h6,dt,dd,figcaption,tr,div,section,article';
+  const blocks = Array.from(doc.body.querySelectorAll(blockSelector)).filter(node => !node.querySelector(blockSelector));
+  let paragraphs = blocks.map(node => normalizeText(node.textContent)).filter(Boolean);
+  if (!paragraphs.length) {
+    const text = (doc.body.textContent || '').replace(/\\u00a0/g, ' ').trim();
+    paragraphs = text.split(/\\n[ \\t]*\\n+/).map(normalizeText).filter(Boolean);
+  }
+  if (!paragraphs.length) {
+    paragraphs = raw.replace(/<br\\s*\\/?\\s*>/gi, '\\n').replace(/<\\/p\\s*>/gi, '\\n\\n').replace(/<[^>]*>/g, ' ').split(/\\n+/).map(normalizeText).filter(Boolean);
+  }
+  return paragraphs.join('\\n\\n') || normalizeText(raw);
 }
 function firstImageFromHtml(value, base) {
   if (!value) return '';
