@@ -37,8 +37,8 @@ function isOEmbedUrl(raw) {
   } catch (_) { return /(?:wp-json\/oembed|oembed\/1\.0\/embed)/i.test(String(raw || '')); }
 }
 
+function isInoreaderUrl(raw) {
   try { return /(^|\.)inoreader\.com$/i.test(new URL(raw).hostname); }
-  try { return /(^|\\.)inoreader\\.com$/i.test(new URL(raw).hostname); }
   catch (_) { return false; }
 }
 
