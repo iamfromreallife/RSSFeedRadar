@@ -247,6 +247,14 @@ rescanButton.addEventListener('click', async () => {
   } catch (_) {}
 });
 
+chrome.storage?.onChanged?.addListener((changes, areaName) => {
+  if (areaName !== 'local' || !changes.rssFeedRadarLanguage) return;
+  const nextLanguage = changes.rssFeedRadarLanguage.newValue;
+  if (!TRANSLATIONS[nextLanguage] || nextLanguage === currentLanguage) return;
+  currentLanguage = nextLanguage;
+  languageSelect.value = currentLanguage;
+  applyTranslations();
+});
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === 'FEEDS_UPDATED' && message.tabId === currentTabId) {
     renderFeeds(message.feeds || []);
