@@ -108,6 +108,12 @@
           <button id="articlesTab" class="story-tab is-active" type="button" role="tab" aria-selected="true" data-i18n="articlesTab">Cards</button>
           <button id="feedInfoTab" class="story-tab" type="button" role="tab" aria-selected="false" data-i18n="feedInfoTab">List</button>
         </div>
+        <label id="cardColumnsControl" class="card-columns-control">
+          <span data-i18n="cardColumns">Card columns</span>
+          <select id="cardColumnsSelect" aria-label="Card columns">
+            <option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+          </select>
+        </label>
         <div class="stories-content-layout">
           <aside class="subscribe-sidebar" aria-label="Subscribe to this feed"><div class="dock-actions">
       <button id="copyButton" class="action-button copy-button" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="7" width="10" height="11" rx="2"/><path d="M13 4H5a2 2 0 0 0-2 2v9"/></svg><span data-i18n="copyFeedUrl">Copy feed URL</span></button>
