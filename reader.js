@@ -646,7 +646,7 @@ function renderStories(items, base) {
         const url = articleUrl();
         if (!url) return;
         event.preventDefault();
-        window.open(url, '_blank', 'noopener,noreferrer');
+        chrome.runtime.sendMessage({ type: 'OPEN_BACKGROUND_TAB', url }).catch(() => {});
       });
       row.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
       detailsList.appendChild(row);
