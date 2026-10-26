@@ -42,6 +42,15 @@ function isInoreaderUrl(raw) {
   catch (_) { return false; }
 }
 
+function isInoreaderBlogFeed(raw) {
+  try {
+    const url = new URL(raw);
+    return isInoreaderUrl(url.href)
+      && url.pathname.replace(/\\/+$/, '') === '/blog/feed'
+      && !url.search;
+  } catch (_) { return false; }
+}
+
 function isYouTubeNavigationFeedUrl(raw) {
   try {
     const url = new URL(raw);
@@ -418,7 +427,7 @@ async function processDiscovery(tabId, message) {
   const pageUrl = safeUrl(message.pageUrl) || '';
   const inoreaderPage = isInoreaderUrl(pageUrl);
   const direct = cleanFeeds(message.feeds, message.pageTitle || 'Website feed')
-    .filter((feed) => !inoreaderPage || isInoreaderUrl(feed.url));
+    .filter((feed) => !inoreaderPage || isInoreaderBlogFeed(feed.url));
   await storeFeeds(tabId, direct, pageUrl);
 
   const already = new Set(direct.map((feed) => feed.url));
@@ -426,7 +435,7 @@ async function processDiscovery(tabId, message) {
     .slice(0, 12)
     .map((item) => ({ url: safeUrl(item?.url), title: String(item?.title || 'Website feed').slice(0, 160) }))
     .filter((item) => item.url && !isOEmbedUrl(item.url)
-      && (!inoreaderPage || isInoreaderUrl(item.url))
+      && (!inoreaderPage || isInoreaderBlogFeed(item.url))
       && !already.has(item.url));
 
   // Domain-wide discovery runs on every site except Reddit. Reddit's anonymous
@@ -475,6 +484,19 @@ async function rescanTab(tabId) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === 'OPEN_BACKGROUND_TAB') {
+    const url = safeUrl(message.url);
+    if (!url) {
+      sendResponse({ ok: false });
+      return false;
+    }
+    chrome.tabs.create({ url, active: false }).then(
+      (tab) => sendResponse({ ok: true, tabId: tab.id }),
+      () => sendResponse({ ok: false })
+    );
+    return true;
+  }
+
   if (message?.type === 'FEEDS_DISCOVERED') {
     const tabId = sender.tab?.id;
     if (!Number.isInteger(tabId)) {
