@@ -594,8 +594,12 @@ function renderStories(items, base) {
     const read = document.createElement('span'); read.className = 'story-read'; read.append(document.createTextNode(translate('openArticle'))); read.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M5 3h8v8"/></svg>'); content.appendChild(read);
     const articleUrl = () => safeUrl(item.url, base);
     const open = () => openArticleModal(item, articleUrl());
-    card.addEventListener('click', open);
-    card.addEventListener('auxclick', event => {
+    card.addEventListener('click', event => {
+      if (event.button !== 0) return;
+      open();
+    });
+    // Handle the middle button on mousedown for consistent browser activation.
+    card.addEventListener('mousedown', event => {
       if (event.button !== 1) return;
       const url = articleUrl();
       if (!url) return;
@@ -621,8 +625,11 @@ function renderStories(items, base) {
       if (item.image) { const img = document.createElement('img'); img.className = 'feed-info-article-image'; img.src = item.image; img.alt = ''; img.loading = index < 3 ? 'eager' : 'lazy'; img.referrerPolicy = 'no-referrer'; img.addEventListener('error', () => img.remove(), {once:true}); row.appendChild(img); }
       const articleUrl = () => safeUrl(item.url, base);
       const open = () => openArticleModal(item, articleUrl());
-      row.addEventListener('click', open);
-      row.addEventListener('auxclick', event => {
+      row.addEventListener('click', event => {
+        if (event.button !== 0) return;
+        open();
+      });
+      row.addEventListener('mousedown', event => {
         if (event.button !== 1) return;
         const url = articleUrl();
         if (!url) return;
