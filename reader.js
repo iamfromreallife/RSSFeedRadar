@@ -103,6 +103,7 @@ function applyReaderSettings() {
   document.documentElement.style.setProperty('--card-columns', String(readerSettings.cardColumns));
   const columnsSelect = $('#cardColumnsSelect');
   if (columnsSelect) columnsSelect.value = String(readerSettings.cardColumns);
+  syncCardColumnsDropdown();
   if (darkModeButton) {
     darkModeButton.setAttribute('aria-pressed', String(readerSettings.darkMode));
     darkModeButton.classList.toggle('is-active', readerSettings.darkMode);
@@ -126,6 +127,25 @@ function setFontFamilyMenuOpen(open) {
   menu.hidden = !open;
   button.setAttribute('aria-expanded', String(open));
   if (open) menu.querySelector(`[data-font-option="${readerSettings.fontFamily}"]`)?.focus();
+}
+function syncCardColumnsDropdown() {
+  const value = String(readerSettings.cardColumns);
+  const current = $('#cardColumnsCurrent');
+  const menu = $('#cardColumnsMenu');
+  if (current) current.textContent = value;
+  menu?.querySelectorAll('[data-columns-option]').forEach(option => {
+    const active = option.dataset.columnsOption === value;
+    option.classList.toggle('is-selected', active);
+    option.setAttribute('aria-checked', String(active));
+  });
+}
+function setCardColumnsMenuOpen(open) {
+  const menu = $('#cardColumnsMenu');
+  const button = $('#cardColumnsButton');
+  if (!menu || !button) return;
+  menu.hidden = !open;
+  button.setAttribute('aria-expanded', String(open));
+  if (open) menu.querySelector(`[data-columns-option="${readerSettings.cardColumns}"]`)?.focus();
 }
 function syncReaderLanguageDropdown() {
   const menu = $('#readerLanguageMenu');
@@ -682,6 +702,8 @@ document.addEventListener('click', (event) => {
   const languageWrap = $('#readerLanguageWrap');
   const languageMenu = $('#readerLanguageMenu');
   if (languageWrap && languageMenu && !languageWrap.contains(event.target)) setReaderLanguageMenuOpen(false);
+  const columnsWrap = $('#cardColumnsWrap');
+  if (columnsWrap && !columnsWrap.contains(event.target)) setCardColumnsMenuOpen(false);
   const fontWrap = $('#fontFamilyWrap');
   const fontMenu = $('#fontFamilyMenu');
   if (fontWrap && fontMenu && !fontWrap.contains(event.target)) setFontFamilyMenuOpen(false);
@@ -691,6 +713,10 @@ document.addEventListener('keydown', event => {
   if ($('#readerLanguageMenu') && !$('#readerLanguageMenu').hidden) {
     setReaderLanguageMenuOpen(false);
     $('#readerLanguageButton').focus();
+  }
+  if ($('#cardColumnsMenu') && !$('#cardColumnsMenu').hidden) {
+    setCardColumnsMenuOpen(false);
+    $('#cardColumnsButton').focus();
   }
   if ($('#fontFamilyMenu') && !$('#fontFamilyMenu').hidden) {
     setFontFamilyMenuOpen(false);
@@ -719,6 +745,16 @@ $('#newsblurButton').addEventListener('click', () => openInReader('newsblur'));
 $('#oldReaderButton').addEventListener('click', () => openInReader('oldreader'));
 $('#readwiseButton').addEventListener('click', () => openInReader('readwise'));
 $('#retryButton').addEventListener('click', fetchFeed);
+$('#cardColumnsButton').addEventListener('click', () => setCardColumnsMenuOpen($('#cardColumnsMenu').hidden));
+$('#cardColumnsMenu').addEventListener('click', event => {
+  const option = event.target.closest('[data-columns-option]');
+  if (!option) return;
+  const select = $('#cardColumnsSelect');
+  select.value = option.dataset.columnsOption;
+  select.dispatchEvent(new Event('change', { bubbles: true }));
+  setCardColumnsMenuOpen(false);
+  $('#cardColumnsButton').focus();
+});
 $('#cardColumnsSelect').addEventListener('change', event => { readerSettings.cardColumns = Math.min(5, Math.max(1, Number(event.target.value) || 2)); applyReaderSettings(); saveReaderSettings(); });
 $('#articlesTab').addEventListener('click', () => switchStoryTab('articles'));
 $('#feedInfoTab').addEventListener('click', () => switchStoryTab('info'));
