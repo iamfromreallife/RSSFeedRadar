@@ -525,6 +525,13 @@ async function fetchFeed() {
         headers: { Accept: 'application/feed+json, application/json, application/atom+xml, application/rss+xml, application/xml, text/xml, */*;q=0.6' }
       });
     } finally { clearTimeout(timeoutId); }
+    // If a site's supposed feed redirects to Reddit, do not present Reddit's
+    // rate-limit page as if it were the site's feed.
+    const requestedHost = new URL(feedUrl).hostname.toLowerCase().replace(/^www\\./, '');
+    const finalHost = new URL(response.url || feedUrl).hostname.toLowerCase().replace(/^www\\./, '');
+    if (finalHost.endsWith('reddit.com') && !requestedHost.endsWith('reddit.com')) {
+      throw new Error(`This URL redirected from ${requestedHost} to ${finalHost}; it is not a valid feed for the original site.`);
+    }
     if (response.status === 429) {
       const error = new Error('The feed server returned HTTP 429.');
       error.code = 'RATE_LIMITED';
