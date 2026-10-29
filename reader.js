@@ -521,7 +521,8 @@ async function fetchFeed() {
     let response;
     try {
       response = await fetch(feedUrl, {
-        method: 'GET', redirect: 'follow', credentials: 'omit', cache: 'no-store', signal: controller.signal,
+        method: 'GET', redirect: 'follow', credentials: 'include', cache: 'default',
+        referrer: new URL('/', feedUrl).href, referrerPolicy: 'strict-origin-when-cross-origin', signal: controller.signal,
         headers: { Accept: 'application/feed+json, application/json, application/atom+xml, application/rss+xml, application/xml, text/xml, */*;q=0.6' }
       });
     } finally { clearTimeout(timeoutId); }
