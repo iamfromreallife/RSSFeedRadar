@@ -376,6 +376,13 @@ async function validateCandidate(candidate) {
       headers: { Accept: 'application/atom+xml, application/rss+xml, application/feed+json, application/xml, text/xml, application/json, */*;q=0.5' }
     });
     if (!response.ok) return null;
+    // Never accept a non-Reddit candidate that redirects into Reddit. This can
+    // otherwise label an unrelated/rerouted destination as the original site's feed.
+    try {
+      const requestedHost = new URL(url).hostname.toLowerCase().replace(/^www\\./, '');
+      const finalHost = new URL(response.url || url).hostname.toLowerCase().replace(/^www\\./, '');
+      if (finalHost.endsWith('reddit.com') && !requestedHost.endsWith('reddit.com')) return null;
+    } catch (_) { return null; }
     // Validate the response body itself rather than trusting Content-Type: some
     // publishers serve valid RSS as text/html or application/octet-stream.
     const body = await readResponseSample(response);
