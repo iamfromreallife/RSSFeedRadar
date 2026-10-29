@@ -266,7 +266,8 @@ async function fetchHomepageCandidates(origin) {
 
 function defaultDomainFeedCandidates(origins) {
   const paths = [
-    ['/feed/', 'Website feed'],
+    // Probe one canonical feed route, not both /feed/ and /feed: servers often
+    // redirect between them, needlessly doubling requests and triggering 429s.
     ['/feed', 'Website feed'],
     ['/rss.xml', 'Website RSS feed'],
     ['/rss/', 'Website RSS feed'],
@@ -370,8 +371,10 @@ async function validateCandidate(candidate) {
     const response = await fetch(url, {
       method: 'GET',
       redirect: 'follow',
-      credentials: 'omit',
-      cache: 'no-store',
+      credentials: 'include',
+      cache: 'default',
+      referrer: new URL('/', url).href,
+      referrerPolicy: 'strict-origin-when-cross-origin',
       signal: controller.signal,
       headers: { Accept: 'application/atom+xml, application/rss+xml, application/feed+json, application/xml, text/xml, application/json, */*;q=0.5' }
     });
